@@ -87,7 +87,7 @@ class AuthController{
         }
     }
 
-    //POST /forgotPassword
+    //POST /password/forgot
     async forgotPassword(req, res, next){
         const {email} = req.body
     try{
@@ -106,7 +106,7 @@ class AuthController{
     }
     }
 
-    //POST /resetPassword
+    //POST /password/reset
     async resetPassword(req, res, next){
         const {email, otp, password} = req.body
         try{

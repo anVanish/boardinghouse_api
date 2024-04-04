@@ -4,6 +4,7 @@ const db = require('./config/db')
 const dotenv = require('dotenv')
 const route = require('./routes')
 const errorHandling = require('./middlewares/errorHandling')
+const handleCors = require('./middlewares/handleCors')
 const app = express()
 const port = process.env.PORT || 5000
 dotenv.config()
@@ -15,6 +16,7 @@ db.connect()
 app.use(morgan('short'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+app.use(handleCors)
 
 //router
 route(app)
