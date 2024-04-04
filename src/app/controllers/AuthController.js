@@ -42,9 +42,9 @@ class AuthController{
 
     //POST /register
     async register(req, res, next){
-        const {email, password} = req.body
+        const {email, password, name} = req.body
         try{
-            if (!email || !password) throw new ErrorRes('Please enter both email number and password')
+            if (!email || !password || !name) throw new ErrorRes('Please enter both email, password and name')
             const existUser = await Users.findOne({email})
             if (existUser) throw new ErrorRes('Email is already registered', 409)
 
