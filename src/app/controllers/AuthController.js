@@ -66,6 +66,7 @@ class AuthController{
             res.json(apiRes)
         }catch(error){
             next(error)
+            
         }
     }
 
