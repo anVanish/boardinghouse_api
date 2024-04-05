@@ -30,8 +30,12 @@ class AuthController{
                 isModerator: user.isModerator
             })
 
+            const resUser = user.toObject()
+            delete resUser.password
+
             const apiRes = new ApiRes()
                 .setSuccess()
+                .setData('user', resUser)
                 .setData('code', code)
             res.json(apiRes)
 
