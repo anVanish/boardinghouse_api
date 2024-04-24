@@ -41,6 +41,8 @@ const Users = new mongoose.Schema({
         enum: ['male', 'female', 'none'],
     },
     birthday: {type: Date},
+    zalo: {type: String},
+    facebook: {type: String},
     isVerified: {type: Boolean, default: false},
     otpCode: {type: Number, default: 0},
     isAdmin: {type: Boolean, default: false},

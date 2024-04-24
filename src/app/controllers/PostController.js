@@ -17,6 +17,7 @@ class PostController{
                 .sort({updatedAt: -1})
                 .limit(limit)
                 .skip((page - 1) * limit)
+                .populate('userId', 'name')
             const count = await Posts.countDocuments({isApproved: true})
 
             const apiRes = new ApiRes()
@@ -32,7 +33,7 @@ class PostController{
     async getPost(req, res, next){
         try{
             const post = await Posts.findOne({slug: req.params.slug})
-                .populate('userId', 'name phone email')
+                .populate('userId', 'name phone email zalo facebook')
                 .populate('categoryId', 'name')
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData('post', post)
