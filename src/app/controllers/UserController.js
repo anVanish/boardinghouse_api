@@ -121,7 +121,8 @@ class UserController{
     //PATCH /:userId/lock
     async lockUser(req, res, next){
         try{
-            const user = await Users.findOneAndUpdate({_id: req.user._id}, {isLocked: true})
+            const _id = req.params.userId
+            const user = await Users.findOneAndUpdate({_id}, {isLocked: true})
             if (!user) throw new ErrorRes('User not found', 404)
 
             const apiRes = new ApiRes().setSuccess('User locked')
@@ -134,7 +135,8 @@ class UserController{
     //PATCH /:userId/unlock
     async unlockUser(req, res, next){
         try{
-            const user = await Users.findOneAndUpdate({_id: req.user._id}, {isLocked: false})
+            const _id = req.params.userId
+            const user = await Users.findOneAndUpdate({_id}, {isLocked: false})
             if (!user) throw new ErrorRes('User not found', 404)
 
             const apiRes = new ApiRes().setSuccess('User unlocked')
