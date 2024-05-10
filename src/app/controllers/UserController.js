@@ -105,7 +105,8 @@ class UserController{
     //PUT /:userId
     async updateUser(req, res, next){
         try{
-            const user = await Users.findOneAndUpdate({_id: req.user._id}, req.body, {new: true, runValidators: true})
+            const _id = req.params.userId
+            const user = await Users.findOneAndUpdate({_id}, req.body, {new: true, runValidators: true})
             if (!user) throw new ErrorRes('User not found', 404)
             
             const {password, ...profile} = user.toObject()
