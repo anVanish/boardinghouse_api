@@ -47,7 +47,9 @@ const Users = new mongoose.Schema({
     otpCode: {type: Number, default: 0},
     isAdmin: {type: Boolean, default: false},
     isModerator: {type: Boolean, default: false},
-    isLocked : {type: Boolean, default: false}
+    isLocked : {type: Boolean, default: false},
+    isDeleted: {type: Boolean, default: false},
+    deletedAt: {type: Date},
 }, {
     timestamps: true,
 });

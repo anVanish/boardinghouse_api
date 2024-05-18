@@ -46,9 +46,9 @@ class AuthController{
 
     //POST /register
     async register(req, res, next){
-        const {email, password, name} = req.body
+        const {email, password, name, phone} = req.body
         try{
-            if (!email || !password || !name) throw new ErrorRes('Please enter both email, password and name')
+            if (!email || !password || !name || !phone) throw new ErrorRes('Please enter both email, password, name and phone')
             const existUser = await Users.findOne({email})
             if (existUser) throw new ErrorRes('Email is already registered', 409)
 
@@ -67,6 +67,28 @@ class AuthController{
         }catch(error){
             next(error)
             
+        }
+    }
+
+    //POST /otp/resend
+    async resendOTP(req, res, next){
+        try{
+            const {email} = req.body
+            const user = await Users.findOne({email})
+            if (!user) throw new ErrorRes('Email not found', 404)
+            if (user.isVerified)
+                return res.json(new ApiRes().setSuccess("Email is verified"))
+
+            //generate and send otp
+            user.otpCode = genOtp()
+            await user.save()
+
+            await sendMail(user.email, 'Yêu cầu gửi lại mã OTP xác thực', `Mã OTP đăng ký của bạn là ${user.otpCode}, bạn không nên chia sẻ mã OTP với người khác.`)
+    
+            const apiRes = new ApiRes().setSuccess('Mail sent, please verify email')
+            res.json(apiRes)
+        } catch(error){
+            next(error)
         }
     }
 

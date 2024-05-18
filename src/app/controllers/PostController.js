@@ -18,6 +18,7 @@ class PostController{
                 .limit(limit)
                 .skip((page - 1) * limit)
                 .populate('userId', 'name')
+                .populate('categoryId', 'name')
             const count = await Posts.countDocuments({isApproved: true})
 
             const apiRes = new ApiRes()
@@ -190,7 +191,7 @@ class PostController{
     //DELETE /:postId
     async deletePost(req, res, next){
         try{
-            const post = await Posts.findOneAndDelete({slug: req.params.slug, userId: req.user._id})
+            const post = await Posts.findOneAndDelete({slug: req.params.slug})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setSuccess('Post deleted')
             res.json(apiRes)

@@ -42,6 +42,7 @@ const Posts = new mongoose.Schema({
     renters: {
         type: String,
         enum: ['male', 'female', 'all'],
+        required: [true, 'Please provide gender for renters [male, femail, all]'],
     },
     views: {type: Number, default: 0},
     images: [{type: String}],
@@ -55,7 +56,10 @@ const Posts = new mongoose.Schema({
     },
     isPaid: {type: Boolean, default: false},
     isApproved: {type: Boolean, default: false},
+    isHided: {type: Boolean, default: false},
     violation: {type: String},
+    startedAt: {type: Date},
+    endedAt: {type: Date},
     moderatedBy: {type: ObjectId, ref: 'users'}
 }, {
     timestamps: true,

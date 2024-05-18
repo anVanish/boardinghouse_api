@@ -148,9 +148,45 @@ class UserController{
 
     //DELETE /:userId
     async deleteUser(req, res, next){
-        
+        try{
+            const _id = req.params.userId
+            const user = await Users.findOneAndUpdate({_id}, {isDeleted: true, deletedAt: new Date()})
+            if (!user || user.isDeleted) throw new ErrorRes("User not found", 404)
+            
+            const apiRes = new ApiRes().setSuccess("User deleted")
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
     }
 
+    //DELETE /:userId/force
+    async forceDeleteUser(req, res, next){
+        try{
+            const _id = req.params.userId
+            const user = await Users.findOneAndDelete({_id})
+            if (!user) throw new ErrorRes("User not found", 404)
+            
+            const apiRes = new ApiRes().setSuccess("User force deleted")
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
+    }
+
+    //PATCH /:userId/restore
+    async restoreUser(req, res, next){
+        try{
+            const _id = req.params.userId
+            const user = await Users.findOneAndUpdate({_id}, {isDeleted: false}, {new: true})
+            if (!user || !user.isDeleted) throw new ErrorRes("User not found", 404)
+
+            const apiRes = new ApiRes().setSuccess("User restored")
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
+    }
 
 }
 

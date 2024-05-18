@@ -1,7 +1,7 @@
 const {authToken, authUser, authAdmin} = require('../../middlewares/authenticatetion')
 const express = require('express')
 const router = express.Router()
-const {getProfile, updateProfile, updatePassword, listUsers, getUser, updateUser, deleteUser, addUser, lockUser, unlockUser } = require('../../app/controllers/UserController')
+const {getProfile, updateProfile, updatePassword, listUsers, getUser, updateUser, deleteUser, addUser, lockUser, unlockUser, forceDeleteUser, restoreUser } = require('../../app/controllers/UserController')
 
 router.use(authToken)
 router.get('/me', authUser, getProfile)
@@ -16,5 +16,7 @@ router.put('/:userId', updateUser)
 router.patch('/:userId/lock', lockUser)
 router.patch('/:userId/unlock', unlockUser)
 router.delete('/:userId', deleteUser)
+router.delete('/:userId/force', forceDeleteUser)
+router.patch('/:userId/restore', restoreUser)
 
 module.exports = router
