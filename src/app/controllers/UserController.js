@@ -3,6 +3,7 @@ const ApiRes = require("../utils/ApiRes")
 const ErrorRes = require("../utils/ErrorRes")
 const bcrypt = require('bcryptjs')
 const filterAddUpdateUser = require('../utils/filters/filterAddUpdateUser')
+const userFilter = require('../utils/filters/userFilter')
 
 class UserController{
     //GET /me 
@@ -57,25 +58,22 @@ class UserController{
     //admin
     //GET /
     async listUsers(req, res, next){
-        const page = req.query.page || 1
-        const limit = req.query.limit || 6
-        const search = req.query.search || ''
-        let filter = {}
-        if (search)
-            filter = {'name': { $regex: `.*${search}.*`, $options: 'i' }}
+        const {pagination, filter} = userFilter(req.query)
         try{
             const users = await Users.find(filter)
                 .sort({updatedAt: -1})
-                .limit(limit)
-                .skip((page - 1) * limit)
+                .limit(pagination.limit)
+                .skip(pagination.skip)
             
             const usersObject = users.map(user => {
                 const {password, ...other} = user.toObject()
                 return other
             })
-            const count = await Users.countDocuments(filter)
+            const total = await Users.countDocuments(filter)
+
             const apiRes = new ApiRes()
-                .setData('count', count)
+                .setData('total', total)
+                .setData('count', usersObject.length)
                 .setData('users', usersObject)
             res.json(apiRes)
         }catch(error){
