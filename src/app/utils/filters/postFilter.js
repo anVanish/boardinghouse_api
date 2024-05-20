@@ -6,7 +6,7 @@ function getPostFilter(search, city, district, ward, minArea, maxArea, minPrice,
         ...(maxArea >= 0 && { area: { ...(minArea >= 0 ? { $gte: minArea } : {}), $lte: maxArea } }),
         ...(minPrice >= 0 && { price: { $gte: minPrice } }),
         ...(maxPrice >= 0 && { price: { ...(minPrice >= 0 ? { $gte: minPrice } : {}), $lte: maxPrice } }),
-        ...(city && {'address.city': city}),
+        ...(city && {'address.city': city}), 
         ...(district && {'address.district': district}),
         ...(ward && {'address.ward': ward}),
 
