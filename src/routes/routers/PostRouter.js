@@ -1,10 +1,11 @@
 const {authToken, authUser, authModerator, authAdmin} = require('../../middlewares/authenticatetion')
 const express = require('express')
 const router = express.Router()
-const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listUnapprovedPost, approvedPost, violatedPost} = require('../../app/controllers/PostController')
+const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listPostsModerator, approvedPost, violatedPost, listPostsAdmin} = require('../../app/controllers/PostController')
 
 router.get('/me',authToken, authUser, myPosts)
-router.get('/moderators', authToken, authModerator, listUnapprovedPost)
+router.get('/moderators', authToken, authModerator, listPostsModerator)
+router.get('/admin', authToken, authAdmin, listPostsAdmin)
 router.get('/', listPosts)
 router.get('/:slug', getPost)
 

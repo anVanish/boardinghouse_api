@@ -1,31 +1,25 @@
-const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
 function getUserFilter(search, role, deleted){
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/
     //search
-    let filter = {}
-    if (objectIdRegex.test(search)) filter = {_id: search}
-    else filter = {name: { '$regex': `.*${search}.*`, $options: 'i' }}
+    const searchOption = objectIdRegex.test(search) ? {_id: search} :{name: { '$regex': `.*${search}.*`, $options: 'i' }}
+
     //role
-    let roleOption = {isAdmin: false, isModerator: false}
-    if (role === 'moderator') roleOption.isModerator = true
+    const roleOption = {isAdmin: false, isModerator: role === 'moderator'}
+
     //deleted
-    if (deleted)
-        return {
-            $and:[
-                filter,
-                roleOption,
-                {isDeleted: true}
-            ]
-        }
+    const deletedOption = deleted 
+        ? {isDeleted: true} 
+        : {$or: [
+            {isDeleted: false},
+            {isDeleted: {$exists: false}}
+        ]}
     
     return {
         $and:[
-            filter,
+            searchOption,
             roleOption,
-            {$or: [
-                {isDeleted: false},
-                {isDeleted: {$exists: false}}
-            ]}
+            deletedOption
         ]
     }
     
@@ -33,16 +27,16 @@ function getUserFilter(search, role, deleted){
 
 function userFilter(query){
     //pagination
-    const page = query.page ? parseInt(query.page) : 1
-    const limit = query.limit ? parseInt(query.limit) : 10
+    const page = parseInt(query.page) || 1
+    const limit = parseInt(query.limit) || 10
     const skip = (page - 1) * limit
     const pagination = {page, limit, skip}
 
     //search
-    const search = query.search ? query.search : ''
+    const search = query.search || ''
 
     //filter
-    const deleted = (query.deleted === 'true')
+    const deleted = query.deleted === 'true'
     const role = query.role
     const filter = getUserFilter(search, role, deleted)
 

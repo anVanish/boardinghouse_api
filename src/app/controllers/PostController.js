@@ -2,27 +2,25 @@ const Posts = require('../models/Posts')
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
-
+const postFilter = require('../utils/filters/postFilter')
 class PostController{
     
     //GET /
     async listPosts(req, res, next){
-        const page = req.query.page || 1
-        const limit = req.query.limit || 6
-        // const search = req.query.search || ''
-        // const filter = {'name': { $regex: `.*${search}.*`, $options: 'i' }}
+        const {pagination, filter} = postFilter(req.query)
 
         try{
-            const posts = await Posts.find({isApproved: true})
+            const posts = await Posts.find(filter)
                 .sort({updatedAt: -1})
-                .limit(limit)
-                .skip((page - 1) * limit)
+                .limit(pagination.limit)
+                .skip(pagination.skip)
                 .populate('userId', 'name')
                 .populate('categoryId', 'name')
-            const count = await Posts.countDocuments({isApproved: true})
+            const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
-                .setData('count', count)
+                .setData('total', total)
+                .setData('count', posts.length)
                 .setData('posts', posts)
             res.json(apiRes)
         }catch(error){
@@ -110,7 +108,7 @@ class PostController{
 
     //moderator
     //GET /moderators
-    async listUnapprovedPost(req, res, next){
+    async listPostsModerator(req, res, next){
         const page = req.query.page || 1
         const limit = req.query.limit || 6
         // const search = req.query.search || ''
@@ -162,6 +160,11 @@ class PostController{
     }
     
     //admin
+    //GET /admin
+    async listPostsAdmin(req, res, next){
+
+    }
+
     //POST /
     async addPost(req, res, next){
         try{
