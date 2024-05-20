@@ -1,6 +1,6 @@
 function getPostFilter(search, city, district, ward, minArea, maxArea, minPrice, maxPrice){
     return {
-        ...{isPaid: true, isApproved: true, isHided: true},
+        ...{isPaid: true, isApproved: true, isHided: false},
         ...(search && { title: { '$regex': `.*${search}.*`, $options: 'i' } }),
         ...(minArea >= 0 && { area: { $gte: minArea } }),
         ...(maxArea >= 0 && { area: { ...(minArea >= 0 ? { $gte: minArea } : {}), $lte: maxArea } }),
