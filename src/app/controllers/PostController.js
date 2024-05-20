@@ -2,7 +2,7 @@ const Posts = require('../models/Posts')
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
-const postFilter = require('../utils/filters/postFilter')
+const {postFilter, postUserFilter, postModeratorFilter} = require('../utils/filters/posts')
 class PostController{
     
     //GET /
@@ -21,6 +21,7 @@ class PostController{
             const apiRes = new ApiRes()
                 .setData('total', total)
                 .setData('count', posts.length)
+                .setData('page', pagination.page)
                 .setData('posts', posts)
             res.json(apiRes)
         }catch(error){
@@ -45,22 +46,18 @@ class PostController{
     //user
     //GET /me
     async myPosts(req, res, next){
-        const page = req.query.page || 1
-        const limit = req.query.limit || 6
-        // const search = req.query.search || ''
-        // const filter = {$and: 
-        //     [{'name': { $regex: `.*${search}.*`, $options: 'i' }}, 
-        //     {userId: req.user._id}]
-        // }
+        const {pagination, filter} = postUserFilter(req.query, req.user._id)
+
         try{
-            const posts = await Posts.find({userId: req.user._id})
+            const posts = await Posts.find(filter)
                 .sort({updatedAt: -1})
-                .limit(limit)
-                .skip((page - 1) * limit)
-            const count = await Posts.countDocuments({userId: req.user._id})
+                .limit(pagination.limit)
+                .skip(pagination.skip)
+            const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
-                .setData('count', count)
+                .setData('total', total)
+                .setData('page', pagination.page)
                 .setData('posts', posts)
             res.json(apiRes)
         }catch(error){
@@ -109,20 +106,19 @@ class PostController{
     //moderator
     //GET /moderators
     async listPostsModerator(req, res, next){
-        const page = req.query.page || 1
-        const limit = req.query.limit || 6
-        // const search = req.query.search || ''
-        // const filter = {'name': { $regex: `.*${search}.*`, $options: 'i' }}
+        const {pagination, filter} = postModeratorFilter(req.query)
 
         try{
-            const posts = await Posts.find({isApproved: false})
+            const posts = await Posts.find(filter)
                 .sort({updatedAt: -1})
-                .limit(limit)
-                .skip((page - 1) * limit)
-            const count = await Posts.countDocuments({isApproved: false})
+                .limit(pagination.limit)
+                .skip(pagination.skip)
+            const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
-                .setData('count', count)
+                .setData('total', total)
+                .setData('count', posts.length)
+                .setData('page', pagination.page)
                 .setData('posts', posts)
             res.json(apiRes)
         }catch(error){

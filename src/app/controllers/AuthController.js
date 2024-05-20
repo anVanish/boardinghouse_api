@@ -77,7 +77,7 @@ class AuthController{
             const user = await Users.findOne({email})
             if (!user) throw new ErrorRes('Email not found', 404)
             if (user.isVerified)
-                return res.json(new ApiRes().setSuccess("Email is verified"))
+                throw new ErrorRes('Email is already verified', 409)
 
             //generate and send otp
             user.otpCode = genOtp()

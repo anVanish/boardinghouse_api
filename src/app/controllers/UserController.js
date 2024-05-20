@@ -74,6 +74,7 @@ class UserController{
             const apiRes = new ApiRes()
                 .setData('total', total)
                 .setData('count', usersObject.length)
+                .setData('page', pagination.page)
                 .setData('users', usersObject)
             res.json(apiRes)
         }catch(error){
@@ -176,7 +177,7 @@ class UserController{
     async restoreUser(req, res, next){
         try{
             const _id = req.params.userId
-            const user = await Users.findOneAndUpdate({_id}, {isDeleted: false}, {new: true})
+            const user = await Users.findOneAndUpdate({_id}, {isDeleted: false})
             if (!user || !user.isDeleted) throw new ErrorRes("User not found", 404)
 
             const apiRes = new ApiRes().setSuccess("User restored")
