@@ -1,8 +1,6 @@
 const setStateFilter = require('./setStateFilter')
 
-function getFilter(search, city, district, ward, tab, userFilter, categoryId){
-    const phoneRegex = /^0\d{9}$/
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+function getFilter(search, city, district, ward, tab, categoryId){
     const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
     const tabOptions = {
@@ -14,21 +12,12 @@ function getFilter(search, city, district, ward, tab, userFilter, categoryId){
         'inHide': {isHided: true},
     }
 
-    let userFilterOption = {}
-    if (userFilter)
-        userFilterOption = 
-            phoneRegex.test(userFilter) ? {'userId.phone': userFilter} :
-            objectIdRegex.test(userFilter) ? {'userId._id': userFilter} :
-            emailRegex.test(userFilter) ? {'userId.email': userFilter} : 
-            {'userId.name': userFilter}
-
     return {
         ...(tab && tabOptions[tab] ? tabOptions[tab] : tabOptions['all']),
         ...(search ? objectIdRegex.test(search) ? {_id: search} : { title: { '$regex': `.*${search}.*`, $options: 'i' } } : {}),
         ...(city && {'address.city': city}),
         ...(district && {'address.district': district}),
         ...(ward && {'address.ward': ward}),
-        ...userFilterOption,
         ...(categoryId && {categoryId}),
     }
 }
@@ -37,8 +26,7 @@ function postAdminFilter(query){
     const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
 
     const tab = query.tab || 'all'
-    const userFilter = query.userFilter || ''
-    const filter = getFilter(search, city, district, ward, tab, userFilter, categoryId)
+    const filter = getFilter(search, city, district, ward, tab, categoryId)
 
     return {pagination, filter}
 }

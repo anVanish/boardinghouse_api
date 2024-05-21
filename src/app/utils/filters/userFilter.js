@@ -1,6 +1,23 @@
 
 function getUserFilter(search, role, deleted){
+    const phoneRegex = /^0\d{9}$/
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     const objectIdRegex = /^[0-9a-fA-F]{24}$/
+
+    return {
+        isAdmin: false,
+        ...(search ? objectIdRegex.test(search) ? {_id: search} : 
+        phoneRegex.test(search) ? {phone: search} :
+        emailRegex.test(search) ? {email: search} :
+        {name: { '$regex': `.*${search}.*`, $options: 'i' }} :
+        {}),
+        ...(role && {isModerator: role === 'moderator'}),
+        ...(deleted ? {isDeleted: true} : {$or: [
+            {isDeleted: false},
+            {isDeleted: {$exists: false}}
+        ]}),
+    }
+
     //search
     const searchOption = objectIdRegex.test(search) ? {_id: search} :{name: { '$regex': `.*${search}.*`, $options: 'i' }}
 
