@@ -3,6 +3,7 @@ const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
 const {postFilter, postUserFilter, postModeratorFilter} = require('../utils/filters/posts')
+const postAdminFilter = require('../utils/filters/posts/postAdminFilter')
 class PostController{
     
     //GET /
@@ -158,7 +159,25 @@ class PostController{
     //admin
     //GET /admin
     async listPostsAdmin(req, res, next){
+        try{
+            const {pagination, filter} = postAdminFilter(req.query)
 
+            const posts = await Posts.find(filter)
+                        .sort({updatedAt: -1})
+                        .limit(pagination.limit)
+                        .skip(pagination.skip)
+                        .populate("userId", "name phone email")
+
+            const total = await Posts.countDocuments(filter)
+            const apiRes = new ApiRes()
+                        .setSuccess()
+                        .setData('total', total)
+                        .setData('count', posts.length)
+                        .setData('posts', posts)
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
     }
 
     //POST /
