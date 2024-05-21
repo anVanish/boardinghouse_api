@@ -49,8 +49,13 @@ class AuthController{
         const {email, password, name, phone} = req.body
         try{
             if (!email || !password || !name || !phone) throw new ErrorRes('Please enter both email, password, name and phone')
-            const existUser = await Users.findOne({email})
-            if (existUser) throw new ErrorRes('Email is already registered', 409)
+            let existUser = await Users.findOne({$or: [{email}, {phone}]})
+            if (existUser) {
+                if (existUser.email === email)
+                    throw new ErrorRes('Email is already registered', 409)
+                else if (existUser.phone === phone)
+                    throw new ErrorRes('Phone is already registered', 409)
+            }
 
             const salt = bcrypt.genSaltSync(10)
             const hashPassword = bcrypt.hashSync(password, salt)
