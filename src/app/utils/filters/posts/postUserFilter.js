@@ -4,7 +4,7 @@ function getFilter(userId, search, city, district, ward, tab){
     const tabOptions = {
         'posted': { isPaid: true, isApproved: true, isHided: false },
         'inPay': { isPaid: false },
-        'inApprove': { isApproved: false, isViolated: false },
+        'inApprove': {isPaid: true, isApproved: false, isViolated: false },
         'inViolation': { isViolated: true },
         'inHide': { isHided: true }
     };

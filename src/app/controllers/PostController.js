@@ -4,6 +4,7 @@ const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
 const {postFilter, postUserFilter, postModeratorFilter} = require('../utils/filters/posts')
 const postAdminFilter = require('../utils/filters/posts/postAdminFilter')
+const postAdminModeratorFilter = require('../utils/filters/posts/postAdminModeratorFilter')
 class PostController{
     
     //GET /
@@ -130,8 +131,10 @@ class PostController{
     //PATCH /:slug/approved
     async approvedPost(req, res, next){
         try{
-            const toUpdateData = {isApproved: true, moderatedBy: req.user._id}
-            const post = await Posts.findOneAndUpdate({slug: req.params.slug}, toUpdateData, {new: true})
+            const post = await Posts.findOneAndUpdate(
+                {slug: req.params.slug}, 
+                {isApproved: true, isViolated: false, moderatedBy: req.user._id}, 
+                {new: true})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post approved')
             res.json(apiRes)
@@ -146,8 +149,10 @@ class PostController{
             const {violation} = req.body
             if (!violation) throw new ErrorRes('Missing violation reason', 400)
 
-            const toUpdateData = {isApproved: false, moderatedBy: req.user._id, violation}
-            const post = await Posts.findOneAndUpdate({slug: req.params.slug}, toUpdateData, {new: true})
+            const post = await Posts.findOneAndUpdate(
+                {slug: req.params.slug}, 
+                {violation, isViolated: true, isApproved: false, moderatedBy: req.user._id}, 
+                {new: true})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post unapproved')
             res.json(apiRes)
@@ -172,9 +177,35 @@ class PostController{
             const apiRes = new ApiRes()
                         .setSuccess()
                         .setData('total', total)
-                        .setData('count', posts.length)
+                        .setData('count', posts.length)       
+                        .setData('page', pagination.page)
                         .setData('posts', posts)
             res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
+    }
+
+    //GET /admin/moderator
+    async listPostsAdminModerator(req, res, next){
+        try{
+            const {pagination, filter} = postAdminModeratorFilter(req.query, req.user._id)     
+            const posts = await Posts.find(filter)
+                        .sort({updatedAt: -1})
+                        .limit(pagination.limit)
+                        .skip(pagination.skip)
+                        .populate('userId', 'name phone email')
+                        .populate('moderatedBy', 'name phone email')
+            const total = await Posts.countDocuments(filter)
+
+            const apiRes = new ApiRes()
+                        .setSuccess()
+                        .setData('total', total)       
+                        .setData('count', posts.length)       
+                        .setData('page', pagination.page)       
+                        .setData('posts', posts)       
+            res.json(apiRes)
+
         }catch(error){
             next(error)
         }

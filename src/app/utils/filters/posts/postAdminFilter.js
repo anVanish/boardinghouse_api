@@ -8,8 +8,8 @@ function getFilter(search, city, district, ward, tab, userFilter){
     const tabOptions = {
         'all': {},
         'posted': { isPaid: true, isApproved: true, isHided: false },
-        'inApprove': {isApproved: false, isViolated: false},
         'inPay': {isPaid: false},
+        'inApprove': {isPaid: true, isApproved: false, isViolated: false},
         'inViolation': {isViolated: true},
         'inHide': {isHided: true},
     }
@@ -23,7 +23,7 @@ function getFilter(search, city, district, ward, tab, userFilter){
             {'userId.name': userFilter}
 
     return {
-        ...(tab && tabOptions[tab] ? tabOptions[tab] : {}),
+        ...(tab && tabOptions[tab] ? tabOptions[tab] : tabOptions['all']),
         ...(search ? objectIdRegex.test(search) ? {_id: search} : { title: { '$regex': `.*${search}.*`, $options: 'i' } } : {}),
         ...(city && {'address.city': city}),
         ...(district && {'address.district': district}),

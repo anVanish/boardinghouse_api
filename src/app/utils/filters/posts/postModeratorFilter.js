@@ -1,23 +1,11 @@
 const setStateFilter = require('./setStateFilter')
 
-function getFilter(userId, search, tab, city, district, ward,moderatedFilter){
-    const moderatedFilterOption = {
-        $or: [
-            ...(moderatedFilter === 'approved' ? [{ isApproved: true }] : []),
-            ...(moderatedFilter === 'violated' ? [{ isViolated: true }] : []),
-            ...(moderatedFilter !== 'approved' && moderatedFilter !== 'violated' ? [{ isApproved: true }, { isViolated: true }] : [])
-        ]
-    };
+function getFilter(userId, search, tab, city, district, ward, moderatedFilter){
 
     const tabOptions = {
-        'inApprove': {isApproved: false},
-        'myModerated': {
-            moderatedBy: userId, 
-            ...moderatedFilterOption
-        },
-        'moderated': {
-            ...moderatedFilterOption
-        }
+        'inApprove': {isPaid: true, isApproved: false, isViolated: false},
+        'moderated': {$or: [{isApproved: true}, {isViolated: true}] },
+        'myModerated': {moderatedBy: userId, $or: [{isApproved: true}, {isViolated: true}] },
     }
 
 
@@ -26,7 +14,10 @@ function getFilter(userId, search, tab, city, district, ward,moderatedFilter){
         ...(city && {'address.city': city}), 
         ...(district && {'address.district': district}),
         ...(ward && {'address.ward': ward}),
-        ...(tab && tabOptions[tab] || {})
+        ...(tab && tabOptions[tab] || tabOptions['inApprove']),
+        ...(moderatedFilter && moderatedFilter === 'approved' ? {isApproved: true} : 
+            moderatedFilter === 'violated' ? {isViolated: true} :
+            {}),
     }
 }  
 

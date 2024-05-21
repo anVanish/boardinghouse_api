@@ -1,0 +1,32 @@
+const setStateFilter = require('./setStateFilter')
+
+function getFilter(userId, search, city, district, ward, tab, moderatedFilter){
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/
+    const tabOptions = {
+        'inApprove': {isPaid: true, isApproved: false, isViolated: false},
+        'moderated': {$or: [{isApproved: true}, {isViolated: true}]},
+        'myModerated': {moderatedBy: userId, $or: [{isApproved: true}, {isViolated: true}]}
+    }
+
+    return{
+        ...(search ? objectIdRegex.test(search) ? {_id: search} : { title: { '$regex': `.*${search}.*`, $options: 'i' } } : {}),
+        ...(tab && tabOptions[tab] ? tabOptions[tab] : tabOptions['inApprove']),
+        ...(city && {'address.city': city}),
+        ...(district && {'address.district': district}),
+        ...(ward && {'address.ward': ward}),
+        ...(moderatedFilter && moderatedFilter === 'approved' ? {isApproved: true} : 
+            moderatedFilter === 'violated' ? {isViolated: true} :
+            {})
+    }
+}
+
+function postAdminModeratorFilter(query, userId){
+    const {pagination, search, city, district, ward} = setStateFilter(query)
+
+    const tab = query.tab || 'inApprove'
+    const moderatedFilter = (tab === 'moderated' || tab === 'myModerated') ? query.moderatedFilter : ''
+    const filter = getFilter(userId, search, city, district, ward, tab, moderatedFilter)
+    return {pagination, filter}
+}
+
+module.exports = postAdminModeratorFilter
