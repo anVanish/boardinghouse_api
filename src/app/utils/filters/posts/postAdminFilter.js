@@ -29,8 +29,7 @@ function getFilter(search, city, district, ward, tab, userFilter, categoryId){
         ...(district && {'address.district': district}),
         ...(ward && {'address.ward': ward}),
         ...userFilterOption,
-        ...(categoryId && {categoryId})
-
+        ...(categoryId && {categoryId}),
     }
 }
 

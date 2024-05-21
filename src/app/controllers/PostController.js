@@ -2,9 +2,7 @@ const Posts = require('../models/Posts')
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
-const {postFilter, postUserFilter, postModeratorFilter} = require('../utils/filters/posts')
-const postAdminFilter = require('../utils/filters/posts/postAdminFilter')
-const postAdminModeratorFilter = require('../utils/filters/posts/postAdminModeratorFilter')
+const {postFilter, postUserFilter, postModeratorFilter, postAdminFilter, postAdminModeratorFilter} = require('../utils/filters/posts')
 class PostController{
     
     //GET /
@@ -175,9 +173,8 @@ class PostController{
                         .sort({updatedAt: -1})
                         .limit(pagination.limit)
                         .skip(pagination.skip)
-                        .populate("userId", "name phone email")
+                        .populate('userId', 'name phone email')
                         .populate('categoryId', 'name')
-
             const total = await Posts.countDocuments(filter)
             const apiRes = new ApiRes()
                         .setSuccess()
