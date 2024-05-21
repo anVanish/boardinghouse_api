@@ -1,6 +1,6 @@
 const setStateFilter = require('./setStateFilter')
 
-function getFilter(search, city, district, ward, tab, userFilter){
+function getFilter(search, city, district, ward, tab, userFilter, categoryId){
     const phoneRegex = /^0\d{9}$/
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     const objectIdRegex = /^[0-9a-fA-F]{24}$/
@@ -28,16 +28,18 @@ function getFilter(search, city, district, ward, tab, userFilter){
         ...(city && {'address.city': city}),
         ...(district && {'address.district': district}),
         ...(ward && {'address.ward': ward}),
-        ...userFilterOption
+        ...userFilterOption,
+        ...(categoryId && {categoryId})
+
     }
 }
 
 function postAdminFilter(query){
-    const {pagination, search, city, district, ward} = setStateFilter(query)
+    const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
 
     const tab = query.tab || 'all'
     const userFilter = query.userFilter || ''
-    const filter = getFilter(search, city, district, ward, tab, userFilter)
+    const filter = getFilter(search, city, district, ward, tab, userFilter, categoryId)
 
     return {pagination, filter}
 }

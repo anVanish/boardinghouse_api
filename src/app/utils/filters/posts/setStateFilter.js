@@ -13,7 +13,11 @@ function setStateFilter(query){
     const district = query.district || ''
     const ward = query.ward || ''
 
-    return {pagination, search, city, district, ward}
+    //category
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/
+    const categoryId = (query.categoryId && objectIdRegex.test(query.categoryId)) ? query.categoryId : ''
+
+    return {pagination, search, city, district, ward, categoryId}
 }
 
 module.exports = setStateFilter

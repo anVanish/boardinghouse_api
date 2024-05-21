@@ -1,6 +1,6 @@
 const setStateFilter = require('./setStateFilter')
 
-function getFilter(userId, search, city, district, ward, tab, moderatedFilter){
+function getFilter(userId, search, city, district, ward, tab, moderatedFilter, categoryId){
     const objectIdRegex = /^[0-9a-fA-F]{24}$/
     const tabOptions = {
         'inApprove': {isPaid: true, isApproved: false, isViolated: false},
@@ -16,16 +16,18 @@ function getFilter(userId, search, city, district, ward, tab, moderatedFilter){
         ...(ward && {'address.ward': ward}),
         ...(moderatedFilter && moderatedFilter === 'approved' ? {isApproved: true} : 
             moderatedFilter === 'violated' ? {isViolated: true} :
-            {})
+            {}),
+        ...(categoryId && {categoryId})
+
     }
 }
 
 function postAdminModeratorFilter(query, userId){
-    const {pagination, search, city, district, ward} = setStateFilter(query)
+    const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
 
     const tab = query.tab || 'inApprove'
     const moderatedFilter = (tab === 'moderated' || tab === 'myModerated') ? query.moderatedFilter : ''
-    const filter = getFilter(userId, search, city, district, ward, tab, moderatedFilter)
+    const filter = getFilter(userId, search, city, district, ward, tab, moderatedFilter, categoryId)
     return {pagination, filter}
 }
 

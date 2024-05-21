@@ -55,6 +55,8 @@ class PostController{
                 .sort({updatedAt: -1})
                 .limit(pagination.limit)
                 .skip(pagination.skip)
+                .populate('categoryId', 'name')
+
             const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
@@ -115,6 +117,8 @@ class PostController{
                 .sort({updatedAt: -1})
                 .limit(pagination.limit)
                 .skip(pagination.skip)
+                .populate('categoryId', 'name')
+                .populate('userId', 'name phone email')
             const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
@@ -172,6 +176,7 @@ class PostController{
                         .limit(pagination.limit)
                         .skip(pagination.skip)
                         .populate("userId", "name phone email")
+                        .populate('categoryId', 'name')
 
             const total = await Posts.countDocuments(filter)
             const apiRes = new ApiRes()
@@ -196,6 +201,7 @@ class PostController{
                         .skip(pagination.skip)
                         .populate('userId', 'name phone email')
                         .populate('moderatedBy', 'name phone email')
+                        .populate('categoryId', 'name')
             const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
@@ -203,6 +209,7 @@ class PostController{
                         .setData('total', total)       
                         .setData('count', posts.length)       
                         .setData('page', pagination.page)       
+                        .setData('filter', filter)       
                         .setData('posts', posts)       
             res.json(apiRes)
 

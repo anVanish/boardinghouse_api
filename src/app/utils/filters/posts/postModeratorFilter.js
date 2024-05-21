@@ -1,6 +1,6 @@
 const setStateFilter = require('./setStateFilter')
 
-function getFilter(userId, search, tab, city, district, ward, moderatedFilter){
+function getFilter(userId, search, tab, city, district, ward, moderatedFilter, categoryId){
 
     const tabOptions = {
         'inApprove': {isPaid: true, isApproved: false, isViolated: false},
@@ -18,17 +18,19 @@ function getFilter(userId, search, tab, city, district, ward, moderatedFilter){
         ...(moderatedFilter && moderatedFilter === 'approved' ? {isApproved: true} : 
             moderatedFilter === 'violated' ? {isViolated: true} :
             {}),
+        ...(categoryId && {categoryId})
+
     }
 }  
 
 function postsModeratorFilter(query, userId){
     //set stateW
-    const {pagination, search, city, district, ward} = setStateFilter(query)
+    const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
 
     //filter
     const tab = query.tab || 'inApprove'
     const moderatedFilter = ((tab === 'moderated' || tab === 'myModerated')&& query.moderatedFilter) ? query.moderatedFilter : ''
-    const filter = getFilter(userId, search, tab, city, district, ward, moderatedFilter)    
+    const filter = getFilter(userId, search, tab, city, district, ward, moderatedFilter, categoryId)    
 
     return {pagination, filter}
 }

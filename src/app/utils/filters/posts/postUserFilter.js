@@ -1,6 +1,6 @@
 const setStateFilter = require('./setStateFilter')
 
-function getFilter(userId, search, city, district, ward, tab){
+function getFilter(userId, search, city, district, ward, tab, categoryId){
     const tabOptions = {
         'posted': { isPaid: true, isApproved: true, isHided: false },
         'inPay': { isPaid: false },
@@ -15,14 +15,15 @@ function getFilter(userId, search, city, district, ward, tab){
         ...(city && {'address.city': city}),
         ...(district && {'address.district': district}),
         ...(ward && {'address.ward': ward}),
-        ...(tab && tabOptions[tab] || {})
+        ...(tab && tabOptions[tab] || {}),
+        ...(categoryId && {categoryId})
     }
 }
 
 function postUserFilter(query, userId){
-    const {pagination, search, city, district, ward} = setStateFilter(query)
+    const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
     const tab = query.tab || 'posted'
-    const filter = getFilter(userId, search, city, district, ward, tab)
+    const filter = getFilter(userId, search, city, district, ward, tab, categoryId)
 
     return {pagination, filter}
 }
