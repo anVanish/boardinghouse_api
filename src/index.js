@@ -5,9 +5,15 @@ const dotenv = require('dotenv')
 const route = require('./routes')
 const errorHandling = require('./middlewares/errorHandling')
 const handleCors = require('./middlewares/handleCors')
+// const {initializeApp} = require('firebase/app')
+// const firebaseConfig = require('./config/firebase.config')
 const app = express()
 const port = process.env.PORT || 5000
 dotenv.config()
+
+// //connect to firebase
+// initializeApp(firebaseConfig)
+
 
 //connect to db
 db.connect()

@@ -4,6 +4,15 @@ const ErrorRes = require("../utils/ErrorRes")
 const bcrypt = require('bcryptjs')
 const filterAddUpdateUser = require('../utils/filters/filterAddUpdateUser')
 const userFilter = require('../utils/filters/userFilter')
+const {uploadImage} = require('../utils/uploadMedia')
+// const {getStorage, ref, getDownloadURL, uploadBytesResumable} = require('firebase/storage')
+// const {initializeApp} = require('firebase/app')
+// const firebaseConfig = require('../../config/firebase')
+// //connect to firebase
+// initializeApp(firebaseConfig)
+// //get storage
+// const storage = getStorage()
+
 
 class UserController{
     //GET /me 
@@ -23,11 +32,16 @@ class UserController{
     //PUT /me
     async updateProfile(req, res, next){
         try{
-            const user = await Users.findOneAndUpdate({_id: req.user._id}, filterAddUpdateUser(req.body), {new: true,  runValidators: true })
+            const requestBody = req.body
+            if (req.file ) requestBody.img = await uploadImage(req.file, `users/user_${req.user._id}`)
+            
+            const user = await Users.findOneAndUpdate({_id: req.user._id}, filterAddUpdateUser(requestBody), {new: true})
             if (!user) throw new ErrorRes('User not found', 404)
     
             const {password, ...profile} = user.toObject()
-            const apiRes = new ApiRes().setData('user', profile).setSuccess('User updated')
+            const apiRes = new ApiRes()
+                    .setSuccess('User updated')
+                    .setData('user', profile)
             res.json(apiRes)
         }catch(error){
             next(error)
@@ -105,7 +119,11 @@ class UserController{
     async updateUser(req, res, next){
         try{
             const _id = req.params.userId
-            const user = await Users.findOneAndUpdate({_id}, req.body, {new: true, runValidators: true})
+            const requestBody = req.body
+
+            if (req.file ) requestBody.img = await uploadImage(req.file, `users/user_${_id}`)
+
+            const user = await Users.findOneAndUpdate({_id}, requestBody, {new: true, runValidators: true})
             if (!user) throw new ErrorRes('User not found', 404)
             
             const {password, ...profile} = user.toObject()

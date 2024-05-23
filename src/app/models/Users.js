@@ -35,7 +35,7 @@ const Users = new mongoose.Schema({
             message: 'Name is invalid, not contain special character or digit'
         },
     },
-    img: {type: String},
+    img: {type: String, default: 'https://firebasestorage.googleapis.com/v0/b/boardinghouse-59d4f.appspot.com/o/users%2Fdefault.jpg?alt=media&token=a38e7697-ffbc-4526-8268-b846b7fd8efe'},
     gender: {
         type: String,
         enum: ['male', 'female', 'none'],
