@@ -21,7 +21,7 @@ class AuthController{
             if (!user) throw new ErrorRes('Email is not found', 400)
             
             if (!user.isVerified) throw new ErrorRes('Email not verified', 403)
-            if (!user.isLocked) throw new ErrorRes('Your account has been locked', 403)
+            if (user.isLocked) throw new ErrorRes('Your account has been locked', 403)
 
             if (!bcrypt.compareSync(password, user.password)) throw new ErrorRes('Password is incorrect', 401)
 
