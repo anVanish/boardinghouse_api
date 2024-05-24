@@ -6,25 +6,29 @@ initializeApp(firebaseConfig)
 //get storage
 const storage = getStorage()
 
-exports.uploadImage = async (file, filename) => {
-    const storageRef = ref(storage, filename)
-    const metadata = {
-        contentType: file.mimetype,
-    };
-
-    //upload to bucket
-    const snapshot = await uploadBytesResumable(storageRef, file.buffer, metadata)
-
-    //get url
-    const downloadedURL = await getDownloadURL(snapshot.ref)
-
-    return downloadedURL
+exports.uploadMedia = async (file, filename) => {
+        const storageRef = ref(storage, filename)
+        const metadata = {
+            contentType: file.mimetype,
+        };
+    
+        //upload to bucket
+        const snapshot = await uploadBytesResumable(storageRef, file.buffer, metadata)
+    
+        //get url
+        const downloadedURL = await getDownloadURL(snapshot.ref)
+    
+        return downloadedURL
 }
 
-exports.uploadImages = async (files) => {
+exports.uploadMultipleMedia = async (files, folder) => {
+    const uploadedURLs = []
+    
+    for (let i = 0; i < files.length; i++){
+        const filename = `${folder}/post_${i}`
+        const downloadedURL = await this.uploadMedia(files[i], filename)
+        uploadedURLs.push(downloadedURL)
+    }
 
-}
-
-exports.uploadVideo = async (video) => {
-
+    return uploadedURLs
 }

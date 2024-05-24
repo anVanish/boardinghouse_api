@@ -46,6 +46,7 @@ const Posts = new mongoose.Schema({
     },
     views: {type: Number, default: 0},
     images: [{type: String}],
+    video: {type: String},
     priority: {type: Number, default: 0},
     type: {type: String, default: 'default'},
     address: {

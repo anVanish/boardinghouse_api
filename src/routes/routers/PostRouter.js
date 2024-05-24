@@ -3,6 +3,10 @@ const express = require('express')
 const router = express.Router()
 const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listPostsModerator, approvedPost, violatedPost, listPostsAdmin, listPostsAdminModerator} = require('../../app/controllers/PostController')
 
+//multer as middlewares
+const multer = require('multer')
+const upload = multer({ storage: multer.memoryStorage()})
+
 router.get('/me',authToken, authUser, myPosts)
 router.get('/moderators', authToken, authModerator, listPostsModerator)
 router.get('/admin', authToken, authAdmin, listPostsAdmin)
@@ -12,8 +16,14 @@ router.get('/:slug', getPost)
 
 router.use(authToken)
 //user
-router.post('/me', authUser, addMyPost)
-router.put('/:slug/me', authUser, updateMyPost)
+router.post('/me', upload.fields([
+    { name: 'images', maxCount: 10 },
+    { name: 'video', maxCount: 1 }
+]), authUser, addMyPost)
+router.put('/:slug/me',upload.fields([
+    { name: 'images', maxCount: 10 },
+    { name: 'video', maxCount: 1 }
+]), authUser, updateMyPost)
 router.delete('/:slug/me', authUser, deleteMyPost)
 
 //moderator

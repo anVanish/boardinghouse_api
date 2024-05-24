@@ -8,6 +8,7 @@ function filterAddUpdatePost(post){
     if (post.renters) filteredPost.renters = post.renters
     if (post.images) filteredPost.images = post.images
     if (post.address) filteredPost.address = post.address
+    if (post.userId) filteredPost.userId = post.userId
 
     return filteredPost
 }

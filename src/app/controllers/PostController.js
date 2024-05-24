@@ -3,6 +3,8 @@ const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
 const {postFilter, postUserFilter, postModeratorFilter, postAdminFilter, postAdminModeratorFilter} = require('../utils/filters/posts')
+const {uploadMultipleMedia, uploadMedia} = require('../utils/uploadMedia')
+
 class PostController{
     
     //GET /
@@ -70,9 +72,14 @@ class PostController{
     //POST /me
     async addMyPost(req, res, next){
         try{
-            const filteredPost = filterAddUpdatePost(req.body)
-            filteredPost.userId = req.user._id
-            const post = new Posts(filteredPost)
+            const requestBody = req.body
+            requestBody.userId = req.user._id
+            const post = new Posts(filterAddUpdatePost(requestBody))
+            
+            if (req.files.images) post.images = await uploadMultipleMedia(req.files, `houses/${post._id}`)
+
+            if (req.files.video) post.video = await uploadMedia(req.files.video, `housesVideo/video_${post._id}`)
+
             await post.save({runValidators: true})
             const apiRes = new ApiRes().setData('post', post).setSuccess('Post added')
             res.json(apiRes)
@@ -84,9 +91,22 @@ class PostController{
     //PUT /:slug/me
     async updateMyPost(req, res, next){
         try{
-            const post = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, filterAddUpdatePost(req.body), {new: true, runValidators: true})
+            //get post
+            const post = await Posts.findOne({slug: req.params.slug, userId: req.user._id})
             if (!post) throw new ErrorRes('Post not found', 404)
-            const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post updated')
+            
+            //upload imagaes and video
+            const requestBody = filterAddUpdatePost(req.body)
+            if (req.files.images) requestBody.images = await uploadMultipleMedia(req.files.images, `houses/${post._id}`)
+
+            if (req.files.video) requestBody.video = await uploadMedia(req.files.video, `housesVideo/video_${post._id}`)
+            
+            console.log(req.files.video)
+
+            const updatedPost = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, requestBody, {new: true, runValidators: true})
+            const apiRes = new ApiRes()
+                    .setData(['post'], updatedPost)
+                    .setSuccess('Post updated')
             res.json(apiRes)
         }catch(error){
             next(error)

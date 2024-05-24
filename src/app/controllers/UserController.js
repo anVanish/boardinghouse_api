@@ -4,15 +4,7 @@ const ErrorRes = require("../utils/ErrorRes")
 const bcrypt = require('bcryptjs')
 const filterAddUpdateUser = require('../utils/filters/filterAddUpdateUser')
 const userFilter = require('../utils/filters/userFilter')
-const {uploadImage} = require('../utils/uploadMedia')
-// const {getStorage, ref, getDownloadURL, uploadBytesResumable} = require('firebase/storage')
-// const {initializeApp} = require('firebase/app')
-// const firebaseConfig = require('../../config/firebase')
-// //connect to firebase
-// initializeApp(firebaseConfig)
-// //get storage
-// const storage = getStorage()
-
+const {uploadMedia} = require('../utils/uploadMedia')
 
 class UserController{
     //GET /me 
@@ -32,8 +24,9 @@ class UserController{
     //PUT /me
     async updateProfile(req, res, next){
         try{
+            console.log(typeof(req.body))
             const requestBody = req.body
-            if (req.file ) requestBody.img = await uploadImage(req.file, `users/user_${req.user._id}`)
+            if (req.file ) requestBody.img = await uploadMedia(req.file, `users/user_${req.user._id}`)
             
             const user = await Users.findOneAndUpdate({_id: req.user._id}, filterAddUpdateUser(requestBody), {new: true})
             if (!user) throw new ErrorRes('User not found', 404)
@@ -121,7 +114,7 @@ class UserController{
             const _id = req.params.userId
             const requestBody = req.body
 
-            if (req.file ) requestBody.img = await uploadImage(req.file, `users/user_${_id}`)
+            if (req.file ) requestBody.img = await uploadMedia(req.file, `users/user_${_id}`)
 
             const user = await Users.findOneAndUpdate({_id}, requestBody, {new: true, runValidators: true})
             if (!user) throw new ErrorRes('User not found', 404)
