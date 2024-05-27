@@ -72,13 +72,13 @@ class PostController{
     //POST /me
     async addMyPost(req, res, next){
         try{
-            const requestBody = req.body
+            const requestBody = filterAddUpdatePost(req.body)
             requestBody.userId = req.user._id
-            const post = new Posts(filterAddUpdatePost(requestBody))
+            const post = new Posts(requestBody)
             
-            if (req.files.images) post.images = await uploadMultipleMedia(req.files, `houses/${post._id}`)
+            if (req.files && req.files.imageFiles) post.images = await uploadMultipleMedia(req.files.imageFiles, `houses/${post._id}`)
 
-            if (req.files.video) post.video = await uploadMedia(req.files.video, `housesVideo/video_${post._id}`)
+            if (req.files && req.files.videoFile) post.video = await uploadMedia(req.files.videoFile, `housesVideo/video_${post._id}`)
 
             await post.save({runValidators: true})
             const apiRes = new ApiRes().setData('post', post).setSuccess('Post added')
@@ -97,11 +97,9 @@ class PostController{
             
             //upload imagaes and video
             const requestBody = filterAddUpdatePost(req.body)
-            if (req.files.images) requestBody.images = await uploadMultipleMedia(req.files.images, `houses/${post._id}`)
+            if (req.files && req.files.imageFiles) requestBody.images.push(...await uploadMultipleMedia(req.files.imageFiles, `houses/${post._id}`))
 
-            if (req.files.video) requestBody.video = await uploadMedia(req.files.video, `housesVideo/video_${post._id}`)
-            
-            console.log(req.files.video)
+            if (req.files && req.files.videoFile) requestBody.video = await uploadMedia(req.files.videoFile, `housesVideo/video_${post._id}`)
 
             const updatedPost = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, requestBody, {new: true, runValidators: true})
             const apiRes = new ApiRes()
@@ -238,9 +236,14 @@ class PostController{
     //POST /
     async addPost(req, res, next){
         try{
-            const filteredPost = filterAddUpdatePost(req.body)
-            filteredPost.userId = req.body.userId
-            const post = new Posts(filteredPost)
+            const requestBody = filterAddUpdatePost(req.body)
+            requestBody.userId = req.body.userId
+            const post = new Posts(requestBody)
+            
+            if (req.files && req.files.imageFiles) post.images = await uploadMultipleMedia(req.files.imageFiles, `houses/${post._id}`)
+
+            if (req.files && req.files.videoFile) post.video = await uploadMedia(req.files.videoFile, `housesVideo/video_${post._id}`)
+
             await post.save({runValidators: true})
             const apiRes = new ApiRes().setData('post', post).setSuccess('Post added')
             res.json(apiRes)
@@ -252,9 +255,20 @@ class PostController{
     //PUT /:slug
     async updatePost(req, res, next){
         try{
-            const post = await Posts.findOneAndUpdate({slug: req.params.slug}, filterAddUpdatePost(req.body), {new: true, runValidators: true})
+            //get post
+            const post = await Posts.findOne({slug: req.params.slug})
             if (!post) throw new ErrorRes('Post not found', 404)
-            const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post updated')
+            
+            //upload imagaes and video
+            const requestBody = filterAddUpdatePost(req.body)
+            if (req.files && req.files.imageFiles) requestBody.images.push(...await uploadMultipleMedia(req.files.imageFiles, `houses/${post._id}`))
+
+            if (req.files && req.files.videoFile) requestBody.video = await uploadMedia(req.files.videoFile, `housesVideo/video_${post._id}`)
+
+            const updatedPost = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, requestBody, {new: true, runValidators: true})
+            const apiRes = new ApiRes()
+                    .setData(['post'], updatedPost)
+                    .setSuccess('Post updated')
             res.json(apiRes)
         }catch(error){
             next(error)

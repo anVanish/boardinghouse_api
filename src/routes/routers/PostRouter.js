@@ -17,12 +17,12 @@ router.get('/:slug', getPost)
 router.use(authToken)
 //user
 router.post('/me', upload.fields([
-    { name: 'images', maxCount: 10 },
-    { name: 'video', maxCount: 1 }
+    { name: 'imageFiles', maxCount: 10 },
+    { name: 'videoFile', maxCount: 1 }
 ]), authUser, addMyPost)
 router.put('/:slug/me',upload.fields([
-    { name: 'images', maxCount: 10 },
-    { name: 'video', maxCount: 1 }
+    { name: 'imageFiles', maxCount: 10 },
+    { name: 'videoFile', maxCount: 1 }
 ]), authUser, updateMyPost)
 router.delete('/:slug/me', authUser, deleteMyPost)
 

@@ -10,7 +10,7 @@ const upload = multer({ storage: multer.memoryStorage()})
 
 router.use(authToken)
 router.get('/me', authUser, getProfile)
-router.put('/me', authUser, upload.single('img'), updateProfile)
+router.put('/me', authUser, upload.single('imgFile'), updateProfile)
 router.patch('/me/password', authUser, updatePassword)
 
 router.use(authAdmin)

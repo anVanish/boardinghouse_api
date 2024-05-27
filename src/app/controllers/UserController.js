@@ -24,11 +24,10 @@ class UserController{
     //PUT /me
     async updateProfile(req, res, next){
         try{
-            console.log(typeof(req.body))
-            const requestBody = req.body
+            const requestBody = filterAddUpdateUser(req.body)
             if (req.file ) requestBody.img = await uploadMedia(req.file, `users/user_${req.user._id}`)
             
-            const user = await Users.findOneAndUpdate({_id: req.user._id}, filterAddUpdateUser(requestBody), {new: true})
+            const user = await Users.findOneAndUpdate({_id: req.user._id}, requestBody, {new: true})
             if (!user) throw new ErrorRes('User not found', 404)
     
             const {password, ...profile} = user.toObject()
