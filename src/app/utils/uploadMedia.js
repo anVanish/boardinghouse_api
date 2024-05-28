@@ -6,6 +6,12 @@ initializeApp(firebaseConfig)
 //get storage
 const storage = getStorage()
 
+function extractNumberFromPostLink(){
+    const regex = /post_(\d+)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+
 exports.uploadMedia = async (file, filename) => {
         const storageRef = ref(storage, filename)
         const metadata = {
@@ -22,10 +28,11 @@ exports.uploadMedia = async (file, filename) => {
         return downloadedURL
 }
 
-exports.uploadMultipleMedia = async (files, folder) => {
+exports.uploadMultipleMedia = async (files, multiMedia, folder) => {
     const uploadedURLs = []
-    
-    for (let i = 0; i < files.length; i++){
+    const start = multiMedia.length === 0 ? 0 : parseInt(extractNumberFromPostLink(multiMedia[multiMedia.length - 1])) + 1
+
+    for (let i = start; i < files.length; i++){
         const filename = `${folder}/post_${i}`
         const downloadedURL = await this.uploadMedia(files[i], filename)
         uploadedURLs.push(downloadedURL)
