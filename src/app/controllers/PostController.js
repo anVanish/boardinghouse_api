@@ -78,7 +78,7 @@ class PostController{
             
             if (req.files && req.files.imageFiles) post.images = await uploadMultipleMedia(req.files.imageFiles, `houses/${post._id}`)
 
-            if (req.files && req.files.videoFile) post.video = await uploadMedia(req.files.videoFile, `housesVideo/video_${post._id}`)
+            if (req.files && req.files.videoFile) post.video = await uploadMedia(req.files.videoFile[0], `housesVideo/video_${post._id}`)
 
             await post.save({runValidators: true})
             const apiRes = new ApiRes().setData('post', post).setSuccess('Post added')
@@ -99,11 +99,11 @@ class PostController{
             const requestBody = filterAddUpdatePost(req.body)
             if (req.files && req.files.imageFiles) requestBody.images.push(...await uploadMultipleMedia(req.files.imageFiles, `houses/${post._id}`))
 
-            if (req.files && req.files.videoFile) requestBody.video = await uploadMedia(req.files.videoFile, `housesVideo/video_${post._id}`)
+            if (req.files && req.files.videoFile) requestBody.video = await uploadMedia(req.files.videoFile[0], `housesVideo/video_${post._id}`)
 
             const updatedPost = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, requestBody, {new: true, runValidators: true})
             const apiRes = new ApiRes()
-                    .setData(['post'], updatedPost)
+                    .setData('post', post)
                     .setSuccess('Post updated')
             res.json(apiRes)
         }catch(error){

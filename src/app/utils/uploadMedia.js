@@ -11,7 +11,8 @@ exports.uploadMedia = async (file, filename) => {
         const metadata = {
             contentType: file.mimetype,
         };
-    
+        
+
         //upload to bucket
         const snapshot = await uploadBytesResumable(storageRef, file.buffer, metadata)
     
