@@ -7,6 +7,7 @@ function filterAddUpdatePost(post){
     if (post.area) filteredPost.area = post.area
     if (post.renters) filteredPost.renters = post.renters
     filteredPost.images = post.images ? post.images : []
+    filteredPost.video = post.video ? post.video : ""
     if (post.address) filteredPost.address = post.address
     if (post.userId) filteredPost.userId = post.userId
 
