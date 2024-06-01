@@ -1,7 +1,7 @@
 const {authToken, authUser, authModerator, authAdmin} = require('../../middlewares/authenticatetion')
 const express = require('express')
 const router = express.Router()
-const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listPostsModerator, approvedPost, violatedPost, listPostsAdmin, listPostsAdminModerator, getMyPost, getPostModerator, getPostAdmin} = require('../../app/controllers/PostController')
+const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listPostsModerator, approvedPost, violatedPost, listPostsAdmin, listPostsAdminModerator, getMyPost, getPostModerator, getPostAdmin, hideMyPost, hidePost, visibleMyPost, visiblePost} = require('../../app/controllers/PostController')
 
 //multer as middlewares
 const multer = require('multer')
@@ -29,6 +29,8 @@ router.put('/:slug/me',upload.fields([
     { name: 'imageFiles', maxCount: 10 },
     { name: 'videoFile', maxCount: 1 }
 ]), authUser, updateMyPost)
+router.patch('/:slug/hide/me', authUser, hideMyPost)
+router.patch('/:slug/visible/me', authUser, visibleMyPost)
 router.delete('/:slug/me', authUser, deleteMyPost)
 
 //moderator
@@ -39,6 +41,8 @@ router.patch('/:slug/violated', authUser, violatedPost)
 router.use(authAdmin)
 router.post('/', addPost)
 router.put('/:slug', updatePost)
+router.patch('/:slug/hide')
+router.patch('/:slug/visible')
 router.delete('/:slug', deletePost)
 
 module.exports = router
