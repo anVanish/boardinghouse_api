@@ -6,7 +6,7 @@ const {postFilter, postUserFilter, postModeratorFilter, postAdminFilter, postAdm
 const {uploadMultipleMedia, uploadMedia} = require('../utils/uploadMedia')
 
 class PostController{
-    
+    // ----------------------------------------
     //GET /
     async listPosts(req, res, next){
         const {pagination, filter} = postFilter(req.query)
@@ -45,7 +45,7 @@ class PostController{
         }
     }
 
-    //user
+    //user ----------------------------------------
     //GET /me
     async myPosts(req, res, next){
         const {pagination, filter} = postUserFilter(req.query, req.user._id)
@@ -162,7 +162,7 @@ class PostController{
         }
     }
 
-    //moderator
+    //moderator ----------------------------------------
     //GET /moderators
     async listPostsModerator(req, res, next){
         const {pagination, filter} = postModeratorFilter(req.query, req.user._id)
@@ -235,7 +235,7 @@ class PostController{
         }
     }
     
-    //admin
+    //admin ----------------------------------------
     //GET /admin
     async listPostsAdmin(req, res, next){
         try{

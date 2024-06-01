@@ -29,3 +29,8 @@ exports.authAdmin = (req, res, next) =>{
     if (!req.user || !req.user._id || !req.user.isAdmin) return next(new ErrorRes('Only Admin can access', 401))
     next()
 }
+
+exports.authModeratorOrAdmin = (req, res, next) => {
+    if (!req.user || !req.user._id || !req.user.isAdmin && !req.user.isModerator) return next(new ErrorRes('Only Admin or Moderator can access', 401))
+    next()
+}
