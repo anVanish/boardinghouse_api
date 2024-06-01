@@ -35,9 +35,9 @@ class PostController{
     async getPost(req, res, next){
         try{
             const post = await Posts.findOne({slug: req.params.slug})
-                .populate('userId', 'name phone email zalo facebook')
+                .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
-            if (!post) throw new ErrorRes('Post not found', 404)
+            if (!post || post.isHided || !post.isPaid || !post.isApproved) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
         }catch(error){
@@ -63,6 +63,20 @@ class PostController{
                 .setData('total', total)
                 .setData('page', pagination.page)
                 .setData('posts', posts)
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
+    }
+
+    //GET /:slug/me
+    async getMyPost(req, res, next){
+        try{
+            const post = await Posts.findOne({slug: req.params.slug, userId: req.user._id})
+                .populate('userId', 'name phone email zalo facebook img')
+                .populate('categoryId', 'name')
+            if (!post) throw new ErrorRes('Post not found', 404)
+            const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
         }catch(error){
             next(error)
@@ -149,6 +163,20 @@ class PostController{
         }
     }
 
+    //GET /:slug/moderator
+    async getPostModerator(req, res, next){
+        try{
+            const post = await Posts.findOne({slug: req.params.slug})
+                .populate('userId', 'name phone email zalo facebook img')
+                .populate('categoryId', 'name')
+            if (!post) throw new ErrorRes('Post not found', 404)
+            const apiRes = new ApiRes().setData('post', post)
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
+    }
+
     //PATCH /:slug/approved
     async approvedPost(req, res, next){
         try{
@@ -201,6 +229,20 @@ class PostController{
                         .setData('count', posts.length)       
                         .setData('page', pagination.page)
                         .setData('posts', posts)
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
+    }
+
+    //GET /:slug/admin
+    async getPostAdmin(req, res, next){
+        try{
+            const post = await Posts.findOne({slug: req.params.slug})
+                .populate('userId', 'name phone email zalo facebook img')
+                .populate('categoryId', 'name')
+            if (!post) throw new ErrorRes('Post not found', 404)
+            const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
         }catch(error){
             next(error)

@@ -1,17 +1,22 @@
 const {authToken, authUser, authModerator, authAdmin} = require('../../middlewares/authenticatetion')
 const express = require('express')
 const router = express.Router()
-const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listPostsModerator, approvedPost, violatedPost, listPostsAdmin, listPostsAdminModerator} = require('../../app/controllers/PostController')
+const {listPosts, addPost, getPost, updatePost, deletePost, myPosts, addMyPost, updateMyPost, deleteMyPost, listPostsModerator, approvedPost, violatedPost, listPostsAdmin, listPostsAdminModerator, getMyPost, getPostModerator, getPostAdmin} = require('../../app/controllers/PostController')
 
 //multer as middlewares
 const multer = require('multer')
 const upload = multer({ storage: multer.memoryStorage()})
 
+//list posts
 router.get('/me',authToken, authUser, myPosts)
 router.get('/moderators', authToken, authModerator, listPostsModerator)
 router.get('/admin', authToken, authAdmin, listPostsAdmin)
 router.get('/admin/moderators', authToken, authAdmin, listPostsAdminModerator)
 router.get('/', listPosts)
+//get post
+router.get('/:slug/me', authToken, authUser, getMyPost)
+router.get('/:slug/moderator', authToken, authModerator,getPostModerator)
+router.get('/:slug/admin', authToken, authAdmin, getPostAdmin)
 router.get('/:slug', getPost)
 
 router.use(authToken)
