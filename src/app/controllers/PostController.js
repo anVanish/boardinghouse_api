@@ -303,6 +303,8 @@ class PostController{
     //POST /
     async addPost(req, res, next){
         try{
+            console.log(req.body)
+            
             const requestBody = filterAddUpdatePost(req.body)
             requestBody.userId = req.body.userId
             const post = new Posts(requestBody)

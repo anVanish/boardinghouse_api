@@ -39,8 +39,14 @@ router.patch('/:slug/violated', authUser, violatedPost)
 
 //admin
 router.use(authAdmin)
-router.post('/', addPost)
-router.put('/:slug', updatePost)
+router.post('/', upload.fields([
+    { name: 'imageFiles', maxCount: 10 },
+    { name: 'videoFile', maxCount: 1 }
+]), addPost)
+router.put('/:slug', upload.fields([
+    { name: 'imageFiles', maxCount: 10 },
+    { name: 'videoFile', maxCount: 1 }
+]), updatePost)
 router.patch('/:slug/hide')
 router.patch('/:slug/visible')
 router.delete('/:slug', deletePost)
