@@ -128,7 +128,7 @@ class PostController{
     //PATCH /:slug/hide/me
     async hideMyPost(req, res, next){
         try{
-            const post = Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id, isHided: false}, {isHided: true}, {new: true})
+            const post = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id, isHided: false}, {isHided: true}, {new: true})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post hided')
             res.json(apiRes)
@@ -141,7 +141,7 @@ class PostController{
     //PATCH /:slug/visible/me
     async visibleMyPost(req, res, next){
         try{
-            const post = Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id, isHided: true}, {isHided: false}, {new: true})
+            const post = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id, isHided: true}, {isHided: false}, {new: true})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post visibled')
             res.json(apiRes)
@@ -345,7 +345,7 @@ class PostController{
     //PATCH /:slug/hide
     async hidePost(req, res, next){
         try{
-            const post = Posts.findOneAndUpdate({slug: req.params.slug, isHided: false}, {isHided: true}, {new: true})
+            const post = await Posts.findOneAndUpdate({slug: req.params.slug, isHided: false}, {isHided: true}, {new: true})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post hided')
             res.json(apiRes)
@@ -358,7 +358,7 @@ class PostController{
     //PATCH /:slug/visible
     async visiblePost(req, res, next){
         try{
-            const post = Posts.findOneAndUpdate({slug: req.params.slug, isHided: true}, {isHided: false}, {new: true})
+            const post = await Posts.findOneAndUpdate({slug: req.params.slug, isHided: true}, {isHided: false}, {new: true})
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData(['post'], post).setSuccess('Post visibled')
             res.json(apiRes)
