@@ -126,7 +126,7 @@ class PostController{
     //moderator
     //GET /moderators
     async listPostsModerator(req, res, next){
-        const {pagination, filter} = postModeratorFilter(req.query)
+        const {pagination, filter} = postModeratorFilter(req.query, req.user._id)
 
         try{
             const posts = await Posts.find(filter)
@@ -141,6 +141,7 @@ class PostController{
                 .setData('total', total)
                 .setData('count', posts.length)
                 .setData('page', pagination.page)
+                .setData('filter', filter)
                 .setData('posts', posts)
             res.json(apiRes)
         }catch(error){
@@ -223,8 +224,7 @@ class PostController{
                         .setSuccess()
                         .setData('total', total)       
                         .setData('count', posts.length)       
-                        .setData('page', pagination.page)       
-                        .setData('filter', filter)       
+                        .setData('page', pagination.page)
                         .setData('posts', posts)       
             res.json(apiRes)
 
