@@ -1,4 +1,5 @@
 const Users = require('../models/Users')
+const Posts = require('../models/Posts')
 const ApiRes = require("../utils/ApiRes")
 const ErrorRes = require("../utils/ErrorRes")
 const bcrypt = require('bcryptjs')
@@ -175,6 +176,8 @@ class UserController{
             const _id = req.params.userId
             const user = await Users.findOneAndDelete({_id})
             if (!user) throw new ErrorRes("User not found", 404)
+            
+            await Posts.deleteMany({userId: user._id})
             
             const apiRes = new ApiRes().setSuccess("User force deleted")
             res.json(apiRes)
