@@ -3,6 +3,7 @@ const UserRouter = require('./routers/UserRouter')
 const CategoryRouter = require('./routers/CategoryRouter')
 const PostRouter = require('./routers/PostRouter')
 const InvoiceRouter = require('./routers/InvoiceRouter')
+const PackRouter = require('./routers/PackRouter')
 
 function route(app){
     app.use('/api/v1/auth', AuthRouter)
@@ -10,6 +11,7 @@ function route(app){
     app.use('/api/v1/categories', CategoryRouter)
     app.use('/api/v1/posts', PostRouter)
     app.use('/api/v1/invoices', InvoiceRouter)
+    app.use('/api/v1/packs', PackRouter)
 }
 
 module.exports = route

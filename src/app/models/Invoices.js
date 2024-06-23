@@ -5,7 +5,8 @@ const slugify = require('slugify')
 const Invoices = new mongoose.Schema({
     userId: {type: ObjectId, ref: 'users', required: true},
     postId: {type: ObjectId, ref: 'posts', required: true},
-    fee: {
+    packId: {type: ObjectId, ref: 'packs', required: true},
+    amount: {
         type: Number,
         required: [true, 'Missing fee value'],
     },
