@@ -38,6 +38,9 @@ class PostController{
                 .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
             if (!post || post.isHided || !post.isPaid || !post.isApproved) throw new ErrorRes('Post not found', 404)
+
+            post.views = post.views + 1
+            await post.save()
             const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
         }catch(error){
@@ -115,7 +118,10 @@ class PostController{
 
             if (req.files && req.files.videoFile) requestBody.video = await uploadMedia(req.files.videoFile[0], `housesVideo/video_${post._id}`)
 
-            const updatedPost = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, requestBody, {new: true, runValidators: true})
+            const updatedPost = await Posts.findOneAndUpdate(
+                {slug: req.params.slug, userId: req.user._id}, 
+                {...requestBody, isApproved: false, isViolated: false, moderatedBy: null, violation: ''}, 
+                {new: true, runValidators: true})
             const apiRes = new ApiRes()
                     .setData('post', updatedPost)
                     .setSuccess('Post updated')
@@ -303,8 +309,6 @@ class PostController{
     //POST /
     async addPost(req, res, next){
         try{
-            console.log(req.body)
-            
             const requestBody = filterAddUpdatePost(req.body)
             requestBody.userId = req.body.userId
             const post = new Posts(requestBody)
@@ -334,7 +338,10 @@ class PostController{
 
             if (req.files && req.files.videoFile) requestBody.video = await uploadMedia(req.files.videoFile[0], `housesVideo/video_${post._id}`)
 
-            const updatedPost = await Posts.findOneAndUpdate({slug: req.params.slug, userId: req.user._id}, requestBody, {new: true, runValidators: true})
+            const updatedPost = await Posts.findOneAndUpdate(
+                {slug: req.params.slug}, 
+                {...requestBody, isApproved: false, isViolated: false, moderatedBy: null, violation: ''}, 
+                {new: true, runValidators: true})
             const apiRes = new ApiRes()
                     .setData('post', updatedPost)
                     .setSuccess('Post updated')

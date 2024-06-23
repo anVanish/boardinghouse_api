@@ -122,21 +122,22 @@ class AuthController{
 
     //POST /password/forgot
     async forgotPassword(req, res, next){
-        const {email} = req.body
-    try{
-        const user = await Users.findOne({email})
-        if (!user) throw new ErrorRes('User not register account', 400)
-        
-        user.otpCode = genOtp()
-        await user.save()
+        try{
+            const {email} = req.body
+            const user = await Users.findOne({email})
+            if (!user) throw new ErrorRes('User not register account', 400)
+            if (!user.isVerified) throw new ErrorRes('User not verified account', 400)
+            
+            user.otpCode = genOtp()
+            await user.save()
 
-        await sendMail(user.email, 'Đặt lại mật khẩu', `Mã OTP của bạn là ${user.otpCode}, sử dụng để đặt lại mật khẩu, không chia sẻ mã OTP cho người khác`)
+            await sendMail(user.email, 'Đặt lại mật khẩu', `Mã OTP của bạn là ${user.otpCode}, sử dụng để đặt lại mật khẩu, không chia sẻ mã OTP cho người khác`)
 
-        const apiRes = new ApiRes().setSuccess('Mail sent, please verify your email')
-        res.json(apiRes)
-    }catch(error){
-        next(error)
-    }
+            const apiRes = new ApiRes().setSuccess('Mail sent, please verify your email')
+            res.json(apiRes)
+        }catch(error){
+            next(error)
+        }
     }
 
     //POST /password/reset
