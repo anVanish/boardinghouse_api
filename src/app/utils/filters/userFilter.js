@@ -17,29 +17,6 @@ function getUserFilter(search, role, deleted){
             {isDeleted: {$exists: false}}
         ]}),
     }
-
-    //search
-    const searchOption = objectIdRegex.test(search) ? {_id: search} :{name: { '$regex': `.*${search}.*`, $options: 'i' }}
-
-    //role
-    const roleOption = {isAdmin: false, isModerator: role === 'moderator'}
-
-    //deleted
-    const deletedOption = deleted 
-        ? {isDeleted: true} 
-        : {$or: [
-            {isDeleted: false},
-            {isDeleted: {$exists: false}}
-        ]}
-    
-    return {
-        $and:[
-            searchOption,
-            roleOption,
-            deletedOption
-        ]
-    }
-    
 }
 
 function userFilter(query){
