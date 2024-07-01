@@ -11,6 +11,7 @@ const Invoices = new mongoose.Schema({
         required: [true, 'Missing fee value'],
     },
     method: {type: String, required: true},
+    status: {type: String, required: true},
 }, {
     timestamps: true,
 });

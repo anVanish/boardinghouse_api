@@ -4,6 +4,7 @@ const CategoryRouter = require('./routers/CategoryRouter')
 const PostRouter = require('./routers/PostRouter')
 const InvoiceRouter = require('./routers/InvoiceRouter')
 const PackRouter = require('./routers/PackRouter')
+const PaymentRouter = require('./routers/PaymentRouter')
 
 function route(app){
     app.use('/api/v1/auth', AuthRouter)
@@ -12,6 +13,7 @@ function route(app){
     app.use('/api/v1/posts', PostRouter)
     app.use('/api/v1/invoices', InvoiceRouter)
     app.use('/api/v1/packs', PackRouter)
+    app.use('/api/v1/payments', PaymentRouter)
 }
 
 module.exports = route
