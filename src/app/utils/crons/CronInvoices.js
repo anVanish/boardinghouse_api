@@ -4,9 +4,9 @@ const {toVNTimezone} = require('../formatDate')
 
 async function deleteExpiredInvoices(){
     try{
-        const thirtyMinutesAgo = toVNTimezone(new Date(Date.now() - 30 * 60 * 1000))
+        const thirtyMinutesAgo = toVNTimezone(new Date(Date.now() - 5 * 60 * 1000))
 
-        await Invoices.deletedMany({
+        const result = await Invoices.deleteMany({
             isTemp: true,
             createdAt: { $lt: thirtyMinutesAgo },
         })

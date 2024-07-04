@@ -15,7 +15,7 @@ class PaymentController{
 
             //check type
             const paymentTypes = ['pay', 'extend']
-            if (!paymentTypes.includes(req.body.type)) throw new ErrorRes('Type is invalid', 404)
+            if (!paymentTypes.includes(type)) throw new ErrorRes('Type is invalid', 404)
 
             //check if post is paid
             const post = await Posts.findOne({_id: postId})
@@ -62,6 +62,7 @@ class PaymentController{
                 post.isPaid = true
                 post.startedAt = toVNTimezone(new Date())
                 post.endedAt = nextXDays(post.startedAt, invoice.period)
+                post.isExpired = false
                 post.priority = priority
                 await post.save()
 

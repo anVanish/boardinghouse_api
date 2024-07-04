@@ -59,6 +59,7 @@ const Posts = new mongoose.Schema({
     isApproved: {type: Boolean, default: false},
     isViolated: {type: Boolean, default: false},
     isHided: {type: Boolean, default: false},
+    isExpired: {type: Boolean, default: false},
     violation: {type: String},
     startedAt: {type: Date},
     endedAt: {type: Date},

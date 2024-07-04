@@ -28,7 +28,7 @@ function getVNPayParams(req){
     req.connection.socket.remoteAddress;
 
     const {vnp_TmnCode, vnp_ReturnUrl, vnp_OrderType, vnp_CurrCode, vnp_Version, vnp_Command, vnp_Locale} = process.env
-    const {postId, amount, bankCode, locale, orderId} = req.body
+    const {postId, amount, bankCode, locale, orderId, type} = req.body
 
     const now = toVNTimezone(new Date())
     const vnp_ExpireDate = nextXMinutes(now, 15)
