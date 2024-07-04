@@ -6,7 +6,6 @@ const {listInvoice, listMyInvoice, getMyInvoice, addMyInvoice, getInvoice} = req
 router.use(authToken)
 router.get('/me', authUser, listMyInvoice)
 router.get('/:invoiceId', authUser, getMyInvoice)
-router.post('/me', authUser, addMyInvoice)
 
 router.use(authAdmin)
 router.get('/', listInvoice)

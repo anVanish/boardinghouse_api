@@ -15,6 +15,9 @@ class InvoiceController{
                 .sort({updatedAt: -1})
                 .limit(pagination.limit)
                 .skip(pagination.skip)
+                .populate('userId', 'name email phone')
+                .populate('postId', 'title slug')
+                .populate('packId', 'name')
             const total = await Invoices.countDocuments({userId: req.user._id, ...filter})
 
             const apiRes = new ApiRes()
@@ -36,31 +39,9 @@ class InvoiceController{
                         .populate('postId', 'title slug')
                         .populate('packId', 'name description fee')
 
-            if (!invoice) throw new ErrorRes('Inoivce not found', 404)
+            if (!invoice || invoice.isTemp) throw new ErrorRes('Inoivce not found', 404)
             
             const apiRes = new ApiRes().setData('invoice', invoice)
-            res.json(apiRes)
-        }catch(error){
-            next(error)
-        }
-    }
-
-    //POST /me
-    async addMyInvoice(req, res, next){
-        try{
-            const filteredInvoice = filterAddUpdateInvoice(req.body)
-            filteredInvoice.userId = req.user._id
-
-            const post = await Posts.findOne({_id: filteredInvoice.postId, userId: req.user._id})
-            if (!post) throw new ErrorRes('Post not found', 404)
-            if (post.isPaid) throw new ErrorRes('Post is already paid')
-
-            const invoice = new Invoices(filteredInvoice)
-            await invoice.save({runValidators: true})
-            post.isPaid = true
-            await post.save()
-
-            const apiRes = new ApiRes().setData('invoice', invoice).setSuccess('Invoice added')
             res.json(apiRes)
         }catch(error){
             next(error)
@@ -97,7 +78,7 @@ class InvoiceController{
                         .populate('userId', 'name email phone')
                         .populate('postId', 'title slug')
                         .populate('packId', 'name description fee')
-            if (!invoice) throw new ErrorRes('Inoivce not found', 404)
+            if (!invoice || invoice.isTemp) throw new ErrorRes('Inoivce not found', 404)
 
             const apiRes = new ApiRes().setData('invoice', invoice)
             res.json(apiRes)

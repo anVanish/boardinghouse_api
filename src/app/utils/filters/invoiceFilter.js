@@ -3,6 +3,7 @@ function getInvoiceFilter(search, fromDate, toDate){
     const objectIdRegex = /^[0-9a-fA-F]{24}$/
 
     return {
+        isTemp: false,
         ...(search ? objectIdRegex.test(search) ? {$or: [{_id: search}, {postId: search}]} : {} : {}),
         ...(fromDate && {createdAt: {$gte: fromDate}}),
         ...(toDate && {createdAt: {$lte: toDate}}),
