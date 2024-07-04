@@ -33,7 +33,7 @@ function getVNPayParams(req){
     const now = toVNTimezone(new Date())
     const vnp_ExpireDate = nextXMinutes(now, 15)
 
-    const orderInfo = `Thanh toan bai dang ${postId}. So tien la ${amount} VND`
+    const orderInfo = type === 'pay' ? `Thanh toan bai dang ${postId}. So tien la ${amount} VND` : type === 'extend' ? `Gia han thanh toan bai dang ${postId}. So tien la ${amount}` : ''
 
     var vnp_Params = {
         'vnp_Version': vnp_Version,

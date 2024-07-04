@@ -11,7 +11,18 @@ class PaymentController{
     //POST /vnpay/me
     async createVNPPayment(req, res, next){
         try{
-            const {packId, period} = req.body
+            const {packId, period, postId, type} = req.body
+
+            //check type
+            const paymentTypes = ['pay', 'extend']
+            if (!paymentTypes.includes(req.body.type)) throw new ErrorRes('Type is invalid', 404)
+
+            //check if post is paid
+            const post = await Posts.findOne({_id: postId})
+            if (!post) throw new ErrorRes('Post not found', 404)
+            if (post.isPaid && type === 'pay') throw new ErrorRes('Post has been paid', 409)
+            if (type === 'extend' && post.endedAt && post.endedAt > new Date()) throw new ErrorRes('Post has not expired yet', 409)
+
             const pack = await Packs.findOne({_id: packId})
             req.body.amount = pack.fee * period
 
