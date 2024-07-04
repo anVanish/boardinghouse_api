@@ -19,4 +19,6 @@ const Invoices = new mongoose.Schema({
     timestamps: true,
 })
 
+Invoices.index({createdAt: 1})
+
 module.exports = mongoose.model("invoices", Invoices);
