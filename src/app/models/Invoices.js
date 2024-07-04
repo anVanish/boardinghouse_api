@@ -10,10 +10,12 @@ const Invoices = new mongoose.Schema({
         type: Number,
         required: [true, 'Missing fee value'],
     },
-    method: {type: String, required: true},
-    status: {type: String, required: true},
+    method: {type: String, required: true, enum: ['vnpay', 'momo']},
+    period: {type: Number, required: true},
+    isTemp: {type: Boolean, default: true},
+    paidAt: {type: Date},
 }, {
     timestamps: true,
-});
+})
 
 module.exports = mongoose.model("invoices", Invoices);

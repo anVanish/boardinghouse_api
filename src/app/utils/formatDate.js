@@ -20,3 +20,17 @@ exports.revertDateFormat = (dateString) =>{
 
     return new Date(year, month, day, hours, minutes, seconds)
 }
+
+exports.toVNTimezone = (date) => {
+    const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000)
+    return new Date(utcTime + (7 * 60 * 60 * 1000))
+}
+exports.nextXDays = (date, day) => {
+    date = this.toVNTimezone(date)
+    return new Date(date.getTime() + (day * 60 * 60 * 24 * 1000))
+}
+
+exports.nextXMinutes = (date, minute) => {
+    date = this.toVNTimezone(date)
+    return new Date(date.getTime() + (minute * 60 * 1000))
+}
