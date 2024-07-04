@@ -1,5 +1,5 @@
 const qs = require('qs')
-const {formatDate, nextXMinutes} = require('../utils/formatDate')
+const {formatDate, nextXMinutes, toVNTimezone} = require('../utils/formatDate')
 const crypto = require('crypto')
 const dotenv = require('dotenv')
 dotenv.config()
@@ -30,7 +30,8 @@ function getVNPayParams(req){
     const {vnp_TmnCode, vnp_ReturnUrl, vnp_OrderType, vnp_CurrCode, vnp_Version, vnp_Command, vnp_Locale} = process.env
     const {postId, amount, bankCode, locale, orderId} = req.body
 
-    const vnp_ExpireDate = nextXMinutes(new Date(), 15)
+    const now = toVNTimezone(new Date())
+    const vnp_ExpireDate = nextXMinutes(now, 15)
 
     const orderInfo = `Thanh toan bai dang ${postId}. So tien la ${amount} VND`
 
@@ -46,7 +47,7 @@ function getVNPayParams(req){
         'vnp_Amount': amount * 100,
         'vnp_ReturnUrl': vnp_ReturnUrl,
         'vnp_IpAddr': vnp_IpAddr,
-        'vnp_CreateDate': formatDate(date),
+        'vnp_CreateDate': formatDate(now),
         'vnp_ExpireDate': formatDate(vnp_ExpireDate),
     }
     if(bankCode) vnp_Params['vnp_BankCode'] = bankCode
