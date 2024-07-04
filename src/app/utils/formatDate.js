@@ -26,11 +26,9 @@ exports.toVNTimezone = (date) => {
     return new Date(utcTime + (7 * 60 * 60 * 1000))
 }
 exports.nextXDays = (date, day) => {
-    const nextDay = new Date(date.getTime() + (day * 60 * 60 * 24 * 1000))
-    return this.toVNTimezone(nextDay)
+    return new Date(date.getTime() + (day * 60 * 60 * 24 * 1000))
 }
 
 exports.nextXMinutes = (date, minute) => {
-    const nextMinute = new Date(date.getTime() + (minute * 60 * 1000))
-    return this.toVNTimezone(nextMinute)
+    return new Date(date.getTime() + (minute * 60 * 1000))
 }
