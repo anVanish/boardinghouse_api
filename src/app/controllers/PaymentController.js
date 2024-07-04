@@ -5,6 +5,8 @@ const {revertDateFormat, toVNTimezone, nextXDays} = require('../utils/formatDate
 const Invoices = require('../models/Invoices')
 const Packs = require('../models/Packs')
 const Posts = require('../models/Posts')
+const filterAddUpdateInvoice = require('../utils/filters/filterAddUpdateInvoice')
+
 
 // /payments
 class PaymentController{
@@ -26,7 +28,7 @@ class PaymentController{
             const pack = await Packs.findOne({_id: packId})
             req.body.amount = pack.fee * period
 
-            const tempInvoice = new Invoices({...req.body, userId: req.user._id, method: 'vnpay'})
+            const tempInvoice = new Invoices(filterAddUpdateInvoice({...req.body, userId: req.user._id, method: 'vnpay'}))
             req.body.orderId = tempInvoice._id
             await tempInvoice.save()
 

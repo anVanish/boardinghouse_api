@@ -1,7 +1,6 @@
 const Invoices = require('../models/Invoices')
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
-const filterAddUpdateInvoice = require('../utils/filters/filterAddUpdateInvoice')
 const Posts = require('../models/Posts')
 const invoiceFilter = require('../utils/filters/invoiceFilter')
 
