@@ -13,6 +13,7 @@ dotenv.config()
 db.connect()
 
 require('./app/utils/crons/CronInvoices')
+require('./app/utils/crons/CronPost')
 
 //middlewares
 app.use(morgan('short'))

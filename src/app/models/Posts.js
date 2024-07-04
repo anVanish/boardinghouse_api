@@ -68,4 +68,6 @@ const Posts = new mongoose.Schema({
     timestamps: true,
 });
 
+Posts.index({createdAt: 1})
+
 module.exports = mongoose.model("posts", Posts);
