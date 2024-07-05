@@ -18,6 +18,7 @@ class PostController{
                 .skip(pagination.skip)
                 .populate('userId', 'name')
                 .populate('categoryId', 'name')
+                .populate('type', 'name')
             const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
@@ -37,6 +38,7 @@ class PostController{
             const post = await Posts.findOne({slug: req.params.slug})
                 .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
+                .populate('type', 'name')
             if (!post || post.isHided || !post.isPaid || !post.isApproved) throw new ErrorRes('Post not found', 404)
 
             post.views = post.views + 1
@@ -78,6 +80,8 @@ class PostController{
             const post = await Posts.findOne({slug: req.params.slug, userId: req.user._id})
                 .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
+                .populate('moderatedBy', 'name phone')
+                .populate('type', 'name')
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
@@ -180,6 +184,7 @@ class PostController{
                 .skip(pagination.skip)
                 .populate('categoryId', 'name')
                 .populate('userId', 'name phone email')
+                .populate('type', 'name')
             const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()
@@ -200,6 +205,7 @@ class PostController{
             const post = await Posts.findOne({slug: req.params.slug})
                 .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
+                .populate('type', 'name')
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
@@ -253,6 +259,7 @@ class PostController{
                         .skip(pagination.skip)
                         .populate('userId', 'name phone email')
                         .populate('categoryId', 'name')
+                        .populate('type', 'name')
             const total = await Posts.countDocuments(filter)
             const apiRes = new ApiRes()
                         .setSuccess()
@@ -272,6 +279,8 @@ class PostController{
             const post = await Posts.findOne({slug: req.params.slug})
                 .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
+                .populate('moderatedBy', 'name phone')
+                .populate('type', 'name')
             if (!post) throw new ErrorRes('Post not found', 404)
             const apiRes = new ApiRes().setData('post', post)
             res.json(apiRes)
@@ -291,6 +300,7 @@ class PostController{
                         .populate('userId', 'name phone email')
                         .populate('moderatedBy', 'name phone email')
                         .populate('categoryId', 'name')
+                        .populate('type', 'name')
             const total = await Posts.countDocuments(filter)
 
             const apiRes = new ApiRes()

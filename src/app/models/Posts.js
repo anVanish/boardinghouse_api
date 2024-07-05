@@ -48,7 +48,7 @@ const Posts = new mongoose.Schema({
     images: [{type: String}],
     video: {type: String},
     priority: {type: Number, default: 0},
-    type: {type: String, default: 'default'},
+    type: {type: ObjectId, ref: 'packs'},
     address: {
         city: {type: String, required: [true, 'Please enter city']},
         district: {type: String, required: [true, 'Please enter district']},

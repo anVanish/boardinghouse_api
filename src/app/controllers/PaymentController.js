@@ -66,6 +66,7 @@ class PaymentController{
                 post.endedAt = nextXDays(post.startedAt, invoice.period)
                 post.isExpired = false
                 post.priority = priority
+                post.type = invoice.packId
                 await post.save()
 
                 return res.status(200).json({RspCode: '00', Message: 'success'})
