@@ -26,8 +26,9 @@ function postUserFilter(query, userId){
     const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
     const tab = query.tab || 'all'
     const filter = getFilter(userId, search, city, district, ward, tab, categoryId)
+    const sort = { priority: -1, createdAt: -1 }
 
-    return {pagination, filter}
+    return { pagination, filter, sort }
 }
 
 module.exports = postUserFilter

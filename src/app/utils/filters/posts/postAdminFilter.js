@@ -29,7 +29,9 @@ function postAdminFilter(query){
     const tab = query.tab || 'all'
     const filter = getFilter(search, city, district, ward, tab, categoryId)
 
-    return {pagination, filter}
+    const sort = { priority: -1, createdAt: -1 }
+
+    return { pagination, filter, sort }
 }
 
 module.exports = postAdminFilter

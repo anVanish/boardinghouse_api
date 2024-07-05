@@ -9,11 +9,11 @@ class PostController{
     // ----------------------------------------
     //GET /
     async listPosts(req, res, next){
-        const {pagination, filter} = postFilter(req.query)
+        const {pagination, filter, sort} = postFilter(req.query)
 
         try{
             const posts = await Posts.find(filter)
-                .sort({updatedAt: -1})
+                .sort(sort)
                 .limit(pagination.limit)
                 .skip(pagination.skip)
                 .populate('userId', 'name')
@@ -53,11 +53,11 @@ class PostController{
     //user ----------------------------------------
     //GET /me
     async myPosts(req, res, next){
-        const {pagination, filter} = postUserFilter(req.query, req.user._id)
+        const {pagination, filter, sort} = postUserFilter(req.query, req.user._id)
 
         try{
             const posts = await Posts.find(filter)
-                .sort({updatedAt: -1})
+                .sort(sort)
                 .limit(pagination.limit)
                 .skip(pagination.skip)
                 .populate('categoryId', 'name')
@@ -175,11 +175,11 @@ class PostController{
     //moderator ----------------------------------------
     //GET /moderators
     async listPostsModerator(req, res, next){
-        const {pagination, filter} = postModeratorFilter(req.query, req.user._id)
+        const {pagination, filter, sort} = postModeratorFilter(req.query, req.user._id)
 
         try{
             const posts = await Posts.find(filter)
-                .sort({updatedAt: -1})
+                .sort(sort)
                 .limit(pagination.limit)
                 .skip(pagination.skip)
                 .populate('categoryId', 'name')
@@ -251,10 +251,10 @@ class PostController{
     //GET /admin
     async listPostsAdmin(req, res, next){
         try{
-            const {pagination, filter} = postAdminFilter(req.query)
+            const {pagination, filter, sort} = postAdminFilter(req.query)
 
             const posts = await Posts.find(filter)
-                        .sort({updatedAt: -1})
+                        .sort(sort)
                         .limit(pagination.limit)
                         .skip(pagination.skip)
                         .populate('userId', 'name phone email')
@@ -292,9 +292,9 @@ class PostController{
     //GET /admin/moderator
     async listPostsAdminModerator(req, res, next){
         try{
-            const {pagination, filter} = postAdminModeratorFilter(req.query, req.user._id)     
+            const {pagination, filter, sort} = postAdminModeratorFilter(req.query, req.user._id)     
             const posts = await Posts.find(filter)
-                        .sort({updatedAt: -1})
+                        .sort(sort)
                         .limit(pagination.limit)
                         .skip(pagination.skip)
                         .populate('userId', 'name phone email')

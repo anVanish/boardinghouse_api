@@ -28,7 +28,10 @@ function postAdminModeratorFilter(query, userId){
     const tab = query.tab || 'inApprove'
     const moderatedFilter = (tab === 'moderated' || tab === 'myModerated') ? query.moderatedFilter : ''
     const filter = getFilter(userId, search, city, district, ward, tab, moderatedFilter, categoryId)
-    return {pagination, filter}
+
+    const sort = { priority: -1, createdAt: -1 }
+
+    return {pagination, filter, sort}
 }
 
 module.exports = postAdminModeratorFilter
