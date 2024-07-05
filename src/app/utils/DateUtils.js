@@ -32,3 +32,8 @@ exports.nextXDays = (date, day) => {
 exports.nextXMinutes = (date, minute) => {
     return new Date(date.getTime() + (minute * 60 * 1000))
 }
+
+exports.dayDiff = (firstDate, secondDate) => {
+    const diffInMs = Math.abs(firstDate - secondDate)
+    return Math.ceil(diffInMs / (1000 * 60 * 60 * 24))
+}

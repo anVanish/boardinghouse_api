@@ -1,5 +1,5 @@
 const qs = require('qs')
-const {formatDate, nextXMinutes, toVNTimezone} = require('../utils/formatDate')
+const {formatDate, nextXMinutes, toVNTimezone} = require('./DateUtils')
 const crypto = require('crypto')
 const dotenv = require('dotenv')
 dotenv.config()

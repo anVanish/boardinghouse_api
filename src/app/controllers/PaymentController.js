@@ -1,7 +1,7 @@
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const {getVNPayayPaymentURL, checksumVNPayParams} = require('../utils/PaymentService')
-const {revertDateFormat, toVNTimezone, nextXDays} = require('../utils/formatDate')
+const {revertDateFormat, toVNTimezone, nextXDays, dayDiff} = require('../utils/DateUtils')
 const Invoices = require('../models/Invoices')
 const Packs = require('../models/Packs')
 const Posts = require('../models/Posts')
@@ -49,17 +49,23 @@ class PaymentController{
             const {postId, newPackId, expandDay} = req.body
             const request = req
             
-            const {amount, currentPack, newPack, error} = await estimateUpgradeFee(postId, newPackId, expandDay)
+            const {amount, period, currentPack, newPack, error} = await estimateUpgradeFee(postId, newPackId, expandDay)
             if (error) throw error
 
             request.body.amount = amount
+            request.body.period = period
+            request.body.packId = newPack._id
             request.body.type = 'upgrade'
-            request.body.currentPack = currentPack
-            request.body.newPack = newPack
+            request.body.currentPack = currentPack.name
+            request.body.newPack = newPack.name
             request.body.expandDay = expandDay
 
             //temp invoices
-            const tempInvoice = new Invoices(filterAddUpdateInvoice({...request.body, userId: request.user._id, method: 'vnpay', packId: newPack._id}))
+            const tempInvoice = new Invoices(filterAddUpdateInvoice({
+                ...request.body,
+                userId: request.user._id,
+                method: 'vnpay'
+            }))
             request.body.orderId = tempInvoice._id
             await tempInvoice.save()
 
@@ -143,6 +149,8 @@ async function estimateUpgradeFee(postId, newPackId, expandDay){
         if (!post) throw new ErrorRes('Post not found', 404)
         if (post.isExpired ) throw new ErrorRes('Post has been expired', 400)
         if (!post.isPaid) throw new ErrorRes('Post has not been paid yet', 400)
+        const period = dayDiff(post.startedAt, post.endedAt)
+
 
         const currentPack = await Packs.findOne({_id: post.type})
         const newPack = await Packs.findOne({_id: newPackId})
@@ -150,25 +158,18 @@ async function estimateUpgradeFee(postId, newPackId, expandDay){
         if (currentPack.fee > newPack.fee) throw new ErrorRes('Can only upgrade to higher pack', 400)
 
         //calculate fee
-        const dayDiff = (post.endedAt - toVNTimezone(new Date()))
-        const restDay = Math.ceil(dayDiff / (1000 * 60 * 60 * 24))
+        const restDay = dayDiff(toVNTimezone(new Date()), post.endedAt)
         const amount = restDay * (newPack.fee - currentPack.fee) + expandDay * newPack.fee
 
         return {
-            amount, 
+            amount,
+            period, 
             restDay,
-            currentPack: currentPack.name, 
-            newPack: newPack.name, 
-            error: null
+            currentPack: currentPack.toObject(), 
+            newPack: newPack.toObject(), 
         }
     }catch(error){
-        return {
-            amount: 0, 
-            restDay: -1,
-            currentPack: "", 
-            newPack: "", 
-            error
-        }
+        return {error}
     }
 }
 

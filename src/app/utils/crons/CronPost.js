@@ -1,6 +1,6 @@
 const Posts = require('../../models/Posts')
 const cron = require('node-cron')
-const {toVNTimezone} = require('../formatDate')
+const {toVNTimezone} = require('../DateUtils')
 
 async function updateExpiredPost(){
     try{
