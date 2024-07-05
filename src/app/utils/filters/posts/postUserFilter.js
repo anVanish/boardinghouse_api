@@ -7,7 +7,8 @@ function getFilter(userId, search, city, district, ward, tab, categoryId){
         'inPay': { isPaid: false },
         'inApprove': {isPaid: true, isApproved: false, isViolated: false },
         'inViolation': { isViolated: true },
-        'inHide': { isHided: true }
+        'inHide': { isHided: true },
+        'expired': {isExpired: true}
     };
 
     return {
