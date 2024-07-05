@@ -28,12 +28,12 @@ function getVNPayParams(req){
     req.connection.socket.remoteAddress;
 
     const {vnp_TmnCode, vnp_ReturnUrl, vnp_OrderType, vnp_CurrCode, vnp_Version, vnp_Command, vnp_Locale} = process.env
-    const {postId, amount, bankCode, locale, orderId, type} = req.body
+    const {postId, amount, bankCode, locale, orderId, type, currentPack, newPack, expandDay} = req.body
 
     const now = toVNTimezone(new Date())
     const vnp_ExpireDate = nextXMinutes(now, 15)
 
-    const orderInfo = type === 'pay' ? `Thanh toan bai dang ${postId}. So tien la ${amount} VND` : type === 'extend' ? `Gia han thanh toan bai dang ${postId}. So tien la ${amount}` : ''
+    const orderInfo = type === 'pay' ? `Thanh toan bai dang ${postId}.` : type === 'extend' ? `Gia han thanh toan bai dang ${postId}.` : type === 'upgrade' ? `Nang cap goi tin ${currentPack} thanh ${newPack}. Mo rong them ${expandDay}.` : '' + ` So tien la ${amount}VND`
 
     var vnp_Params = {
         'vnp_Version': vnp_Version,

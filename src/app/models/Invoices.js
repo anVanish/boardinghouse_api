@@ -11,7 +11,7 @@ const Invoices = new mongoose.Schema({
         required: [true, 'Missing fee value'],
     },
     method: {type: String, required: true, enum: ['vnpay', 'momo']},
-    type: {type: String, required: true, enum: ['pay', 'extend']},
+    type: {type: String, required: true, enum: ['pay', 'extend', 'upgrade', 'push']},
     period: {type: Number, required: true},
     isTemp: {type: Boolean, default: true},
     paidAt: {type: Date},

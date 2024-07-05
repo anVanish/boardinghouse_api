@@ -4,6 +4,7 @@ const Packs = new mongoose.Schema({
     name: {type: String, required: true},
     fee: {type: Number, required: true},
     description: {type: String, required: true},
+    priority: {type: Number, required: true},
 }, {
     timestamps: true,
 })

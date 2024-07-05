@@ -22,13 +22,52 @@ class PaymentController{
             //check if post is paid
             const post = await Posts.findOne({_id: postId})
             if (!post) throw new ErrorRes('Post not found', 404)
-            if (post.isPaid && type === 'pay') throw new ErrorRes('Post has been paid', 409)
+            if (type === 'pay' && post.isPaid) throw new ErrorRes('Post has been paid', 409)
             if (type === 'extend' && !post.isExpired) throw new ErrorRes('Post has not expired yet', 409)
 
             const pack = await Packs.findOne({_id: packId})
+            if (!pack) throw new ErrorRes('Pack not found', 404)
             req.body.amount = pack.fee * period
 
             const tempInvoice = new Invoices(filterAddUpdateInvoice({...req.body, userId: req.user._id, method: 'vnpay'}))
+            req.body.orderId = tempInvoice._id
+            await tempInvoice.save()
+
+            const paymentUrl = getVNPayayPaymentURL(req)
+            res.json(new ApiRes()
+                .setSuccess()
+                .setData('paymentUrl', paymentUrl)
+            )
+        }catch(error){
+            next(error)
+        }
+    }
+
+    //POST /vnpay/upgrade/me
+    async upgradePostWithVNPay(req, res, next){
+        try{
+            const {postId, newPackId, expandDay} = req.body
+            
+            const post = await Posts.findOne({_id: postId})
+            if (!post) throw new ErrorRes('Post not found', 404)
+            if (post.isExpired ) throw new ErrorRes('Post has been expired', 400)
+            if (!post.isPaid) throw new ErrorRes('Post has not been paid yet', 400)
+
+            const currentPack = await Packs.findOne({_id: post.type})
+            const newPack = await Packs.findOne({_id: newPackId})
+            if (!newPack) throw new ErrorRes('Pack to upgrade not found', 404)
+            if (currentPack.fee > newPack.fee) throw new ErrorRes('Can only upgrade to higher pack', 400)
+
+            //calculate fee
+            const restDay = (post.endedAt - toVNTimezone(new Date())).getDay()
+            req.body.amount = restDay * (newPack.fee - currentPack.fee) + expandDay * newPack.fee
+            req.body.type = 'upgrade'
+            req.body.currentPack = currentPack.name
+            req.body.newPack = newPack.name
+            req.body.expandDay = expandDay
+
+            //temp invoices
+            const tempInvoice = new Invoices(filterAddUpdateInvoice({...req.body, userId: req.user._id, method: 'vnpay', packId: newPack._id}))
             req.body.orderId = tempInvoice._id
             await tempInvoice.save()
 
@@ -54,10 +93,8 @@ class PaymentController{
                 invoice.isTemp = false
                 await invoice.save()
 
-                //get pack info / priority
-                const packNames = ['Tin thường', 'Tin Vip', 'Tin Vip nổi bật']
+                //get pack info
                 const pack = await Packs.findOne({_id: invoice.packId})
-                const priority = packNames.includes(pack.name) ? packNames.indexOf(pack.name) : 0
 
                 //update post
                 const post = await Posts.findOne({_id: invoice.postId})
@@ -65,7 +102,7 @@ class PaymentController{
                 post.startedAt = toVNTimezone(new Date())
                 post.endedAt = nextXDays(post.startedAt, invoice.period)
                 post.isExpired = false
-                post.priority = priority
+                post.priority = pack.priority
                 post.type = invoice.packId
                 await post.save()
 

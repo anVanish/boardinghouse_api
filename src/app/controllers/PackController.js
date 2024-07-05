@@ -1,4 +1,5 @@
 const Packs = require('../models/Packs')
+const Posts = require('../models/Posts')
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePack = require('../utils/filters/filterAddUpdatePack')
@@ -8,7 +9,7 @@ class PackController{
     async listPacks(req, res, next){
         try{
             const packs = await Packs.find({})
-                .sort({updatedAt: -1})
+                .sort({fee: 1})
             const count = await Packs.countDocuments({})
     
             const apiRes = new ApiRes()
@@ -35,10 +36,18 @@ class PackController{
     //PUT /packs/:packId
     async updatePack (req, res, next){
         try{
-            const pack = await Packs.findOneAndUpdate({_id: req.params.packId}, filterAddUpdatePack(req.body), {new: true})
+            const {packId} = req.params
+            
+            const pack = await Packs.findOne({_id: packId}).lean()
             if (!pack) throw new ErrorRes('Pack not found', 404)
-            const apiRes = new ApiRes().setData(['pack'], pack).setSuccess('Pack updated')
-            res.json(apiRes)
+            const oldPriority = pack.priority
+
+            const updatedPack = await Packs.findOneAndUpdate({_id: packId}, filterAddUpdatePack(req.body), {new: true})
+            if (updatedPack.priority !== oldPriority) await Posts.updateMany({type: updatedPack._id}, {priority})
+
+            res.json(new ApiRes()
+                .setSuccess('Pack updated')
+                .setData('pack', pack))
         } catch(error){
             next(error)
         }
