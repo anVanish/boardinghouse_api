@@ -53,7 +53,7 @@ class PaymentController{
             if (error) throw error
 
             request.body.amount = amount
-            request.body.period = period
+            request.body.period = period + expandDay
             request.body.packId = newPack._id
             request.body.type = 'upgrade'
             request.body.currentPack = currentPack.name
@@ -83,7 +83,7 @@ class PaymentController{
     async ipnVNPPayment(req, res, next){
         try{
             let vnp_Params = req.query
-            if (checksumVNPayParams(vnp_Params)) {
+            if (checksumVNPayParams(vnp_Params) && vnp_Params['vnp_TransactionStatus'] === '00') {
                 //update invoice here
                 const orderId = vnp_Params['vnp_TxnRef']
                 const invoice = await Invoices.findOne({_id: orderId})
