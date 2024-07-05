@@ -47,31 +47,23 @@ class PaymentController{
     async upgradePostWithVNPay(req, res, next){
         try{
             const {postId, newPackId, expandDay} = req.body
+            const request = req
             
-            const post = await Posts.findOne({_id: postId})
-            if (!post) throw new ErrorRes('Post not found', 404)
-            if (post.isExpired ) throw new ErrorRes('Post has been expired', 400)
-            if (!post.isPaid) throw new ErrorRes('Post has not been paid yet', 400)
+            const {amount, currentPack, newPack, error} = await estimateUpgradeFee(postId, newPackId, expandDay)
+            if (error) throw error
 
-            const currentPack = await Packs.findOne({_id: post.type})
-            const newPack = await Packs.findOne({_id: newPackId})
-            if (!newPack) throw new ErrorRes('Pack to upgrade not found', 404)
-            if (currentPack.fee > newPack.fee) throw new ErrorRes('Can only upgrade to higher pack', 400)
-
-            //calculate fee
-            const restDay = (post.endedAt - toVNTimezone(new Date())).getDay()
-            req.body.amount = restDay * (newPack.fee - currentPack.fee) + expandDay * newPack.fee
-            req.body.type = 'upgrade'
-            req.body.currentPack = currentPack.name
-            req.body.newPack = newPack.name
-            req.body.expandDay = expandDay
+            request.body.amount = amount
+            request.body.type = 'upgrade'
+            request.body.currentPack = currentPack
+            request.body.newPack = newPack
+            request.body.expandDay = expandDay
 
             //temp invoices
-            const tempInvoice = new Invoices(filterAddUpdateInvoice({...req.body, userId: req.user._id, method: 'vnpay', packId: newPack._id}))
-            req.body.orderId = tempInvoice._id
+            const tempInvoice = new Invoices(filterAddUpdateInvoice({...request.body, userId: request.user._id, method: 'vnpay', packId: newPack._id}))
+            request.body.orderId = tempInvoice._id
             await tempInvoice.save()
 
-            const paymentUrl = getVNPayayPaymentURL(req)
+            const paymentUrl = getVNPayayPaymentURL(request)
             res.json(new ApiRes()
                 .setSuccess()
                 .setData('paymentUrl', paymentUrl)
@@ -114,7 +106,7 @@ class PaymentController{
         }
     }
 
-    //POST /vnpay/checksum
+    //POST /vnpay/checksum/me
     async checksumVNPPayment(req, res, next){
         try{
             const isValid = checksumVNPayParams(req.query)
@@ -126,6 +118,58 @@ class PaymentController{
         }
     }
 
+    //POST /estimate/upgrade/me
+    async estimateUpgradeAmount(req, res, next){
+        try{
+            const { postId, newPackId, expandDay } = req.body
+            const { amount, error, restDay } = await estimateUpgradeFee(postId, newPackId, expandDay)
+            if (error) throw error
+
+            res.json(new ApiRes()
+                .setSuccess('Estimate successfully')
+                .setData('amount', amount)
+                .setData('restDay', restDay)
+            )
+        }catch(error){
+            next(error)
+        }
+    }
+
+}
+
+async function estimateUpgradeFee(postId, newPackId, expandDay){
+    try{
+        const post = await Posts.findOne({_id: postId})
+        if (!post) throw new ErrorRes('Post not found', 404)
+        if (post.isExpired ) throw new ErrorRes('Post has been expired', 400)
+        if (!post.isPaid) throw new ErrorRes('Post has not been paid yet', 400)
+
+        const currentPack = await Packs.findOne({_id: post.type})
+        const newPack = await Packs.findOne({_id: newPackId})
+        if (!newPack) throw new ErrorRes('Pack to upgrade not found', 404)
+        if (currentPack.fee > newPack.fee) throw new ErrorRes('Can only upgrade to higher pack', 400)
+
+        //calculate fee
+        const dayDiff = (post.endedAt - toVNTimezone(new Date()))
+        const restDay = Math.ceil(dayDiff / (1000 * 60 * 60 * 24))
+        const amount = restDay * (newPack.fee - currentPack.fee) + expandDay * newPack.fee
+
+        return {
+            amount, 
+            restDay,
+            currentPack: currentPack.name, 
+            newPack: newPack.name, 
+            error: null
+        }
+    }catch(error){
+        return {
+            amount: 0, 
+            restDay: -1,
+            currentPack: "", 
+            newPack: "", 
+            error
+        }
+    }
 }
 
 module.exports = new PaymentController()
