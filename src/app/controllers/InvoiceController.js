@@ -50,7 +50,7 @@ class InvoiceController{
     //admin
     //GET /
     async listInvoice(req, res, nexy){
-        const {pagination, filter} = invoiceFilter(req, query)
+        const {pagination, filter} = invoiceFilter(req.query)
 
         try{
             const invoices = await Invoices.find(filter)

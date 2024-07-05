@@ -17,7 +17,7 @@ class PaymentController{
 
             //check type
             const paymentTypes = ['pay', 'extend']
-            if (!paymentTypes.includes(type)) throw new ErrorRes('Type is invalid', 404)
+            if (!paymentTypes.includes(type)) throw new ErrorRes('Type is invalid', 400)
 
             //check if post is paid
             const post = await Posts.findOne({_id: postId})
