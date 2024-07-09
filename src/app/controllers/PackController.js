@@ -43,7 +43,7 @@ class PackController{
             const oldPriority = pack.priority
 
             const updatedPack = await Packs.findOneAndUpdate({_id: packId}, filterAddUpdatePack(req.body), {new: true})
-            if (updatedPack.priority !== oldPriority) await Posts.updateMany({type: updatedPack._id}, {priority})
+            if (updatedPack.priority !== oldPriority) await Posts.updateMany({type: updatedPack._id}, {priority: updatedPack.priority})
 
             res.json(new ApiRes()
                 .setSuccess('Pack updated')

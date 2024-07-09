@@ -39,7 +39,7 @@ class PostController{
                 .populate('userId', 'name phone email zalo facebook img')
                 .populate('categoryId', 'name')
                 .populate('type', 'name')
-            if (!post || post.isHided || !post.isPaid || !post.isApproved) throw new ErrorRes('Post not found', 404)
+            if (!post || post.isHided || !post.isPaid || !post.isApproved || post.isExpired) throw new ErrorRes('Post not found', 404)
 
             post.views = post.views + 1
             await post.save()
