@@ -4,12 +4,21 @@ const Posts = require('../../models/Posts')
 const Post = require('../../models/Posts')
 const {toVNTimezone} = require('../../utils/DateUtils')
 const {getData, getSingleData} = require('./dataProcessing')
-
+const mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId
 
 function getMatchCondition(query){
-    const {month, year, filter} = query
-    const matchCondition = { }
+    const {month, year, filter, type, moderatedBy} = query
+    const matchCondition = {}
     
+    if (moderatedBy) matchCondition.moderatedBy = new ObjectId(moderatedBy)
+    if (type === 'approved') matchCondition.isApproved = true 
+    else if (type === 'violated') matchCondition.isViolated = true
+    else if (type === 'toModerated') {
+        matchCondition.isViolated = false
+        matchCondition.isApproved = false
+    }
+
     if (month && year){
         const startDate = new Date(year, month - 1, 1)
         const endDate = new Date(year, month, 1)
@@ -26,6 +35,7 @@ function getMatchCondition(query){
 
 exports.getTotalPost = async(query) => {
     const matchCondition = getMatchCondition(query)
+    console.log(matchCondition)
 
     return getSingleData(await Posts.aggregate([
         {

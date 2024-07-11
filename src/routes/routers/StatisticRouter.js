@@ -1,9 +1,10 @@
-const {authToken, authAdmin} = require('../../middlewares/authenticatetion')
+const {authToken, authAdmin, authModerator} = require('../../middlewares/authenticatetion')
 const express = require('express')
 const router = express.Router()
-const {adminStatistic} = require('../../app/controllers/StatisticController')
+const {adminStatistic, moderatorStatistic} = require('../../app/controllers/StatisticController')
 
-router.use(authToken, authAdmin)
-router.get('/admin', adminStatistic)
+router.use(authToken)
+router.get('/admin', authAdmin, adminStatistic)
+router.get('/moderator', authModerator, moderatorStatistic)
 
 module.exports = router
