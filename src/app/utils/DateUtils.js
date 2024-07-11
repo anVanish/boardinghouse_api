@@ -18,7 +18,7 @@ exports.revertDateFormat = (dateString) =>{
     const minutes = dateString.slice(10, 12)
     const seconds = dateString.slice(12, 14)
 
-    return new Date(year, month, day, hours, minutes, seconds)
+    return new Date(year, month - 1, day, hours, minutes, seconds)
 }
 
 exports.toVNTimezone = (date) => {
