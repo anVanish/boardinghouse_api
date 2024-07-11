@@ -50,6 +50,68 @@ class PostController{
         }
     }
 
+    //GET /:slug/popular
+    async listPopularPosts(req, res, next){
+        try{
+            const {slug} = req.params
+            const currentPost = await Posts.findOne({slug})
+            if (!currentPost) throw new ErrorRes('Slug not found', 404)
+
+            const filter = {
+                'address.city': currentPost.address.city,
+                'address.district': currentPost.address.district,
+                priority: {$gt: 1},
+                slug: {$ne: slug},
+                isPaid: true, isApproved: true, isHided: false, isExpired: false,
+            }
+
+            const popularPosts = await Posts.find(filter)
+                .sort({priority: -1, views: -1, createdAt: -1})
+                .limit(5)
+                .populate('userId', 'name')
+                .populate('categoryId', 'name')
+                .populate('type', 'name')
+
+            res.json(new ApiRes()
+                .setSuccess()
+                .setData('total', popularPosts.length)
+                .setData('popularPosts', popularPosts)
+            )
+        }catch(error){
+            next(error)
+        }
+    }
+
+    //GET /:slug/latest
+    async listLatestPosts(req, res, next){
+        try{
+            const {slug} = req.params
+            const currentPost = await Posts.findOne({slug})
+            if (!currentPost) throw new ErrorRes('Slug not found', 404)
+
+            const latestPosts = await Posts.find({
+                'address.city': currentPost.address.city,
+                'address.district': currentPost.address.district,
+                priority: 1,
+                slug: {$ne: slug},
+                isPaid: true, isApproved: true, isHided: false, isExpired: false, 
+            })
+                .sort({createdAt: -1})
+                .limit(10)
+                .populate('userId', 'name')
+                .populate('categoryId', 'name')
+                .populate('type', 'name')
+
+            res.json(new ApiRes()
+                .setSuccess()
+                .setData('total', latestPosts.length)
+                .setData('latestPosts', latestPosts)
+            )
+        }catch(error){
+            next(error)
+        }
+    }
+
     //user ----------------------------------------
     //GET /me
     async myPosts(req, res, next){

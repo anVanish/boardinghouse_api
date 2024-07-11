@@ -46,6 +46,8 @@ class StatisticController{
             statistics.totalPosts = await getTotalPost({moderatedBy})
             statistics.totalApprovedPost = await getTotalPost({type: 'approved', moderatedBy})
             statistics.totalViolatedPost = await getTotalPost({type: 'violated', moderatedBy})
+            statistics.toModeratedPost = await getTotalPost({type: 'toModerated'})
+
 
             res.json(new ApiRes()
                 .setSuccess()
