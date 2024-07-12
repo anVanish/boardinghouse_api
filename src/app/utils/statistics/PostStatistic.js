@@ -35,7 +35,6 @@ function getMatchCondition(query){
 
 exports.getTotalPost = async(query) => {
     const matchCondition = getMatchCondition(query)
-    console.log(matchCondition)
 
     return getSingleData(await Posts.aggregate([
         {

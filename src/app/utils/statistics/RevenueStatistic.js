@@ -84,7 +84,7 @@ exports.getRevenueByPack = async (query) => {
     ])
 
     return getData(revenueByPack.map(revenue => {
-        const postCount = postsCountByPack.find(post => post._id.toString() === revenue.packId.toString())
+        const postCount = revenue.packId && postsCountByPack.find(post => (post._id && post._id.toString() === revenue.packId.toString()))
         return {
             ...revenue,
             totalPosts: postCount ? postCount.totalPosts : 0

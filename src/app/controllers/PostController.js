@@ -1,9 +1,11 @@
 const Posts = require('../models/Posts')
+const Packs = require('../models/Packs')
 const ApiRes = require('../utils/ApiRes')
 const ErrorRes = require('../utils/ErrorRes')
 const filterAddUpdatePost = require('../utils/filters/filterAddUpdatePost')
 const {postFilter, postUserFilter, postModeratorFilter, postAdminFilter, postAdminModeratorFilter} = require('../utils/filters/posts')
 const {uploadMultipleMedia, uploadMedia} = require('../utils/uploadMedia')
+
 
 class PostController{
     // ----------------------------------------
@@ -57,10 +59,13 @@ class PostController{
             const currentPost = await Posts.findOne({slug})
             if (!currentPost) throw new ErrorRes('Slug not found', 404)
 
+            const normalPack = await Packs.findOne({}).sort({priority: 1})
+            if (!normalPack) throw new ErrorRes('There no packs found', 404)
+
             const filter = {
                 'address.city': currentPost.address.city,
                 'address.district': currentPost.address.district,
-                priority: {$gt: 1},
+                priority: {$gt: normalPack.priority},
                 slug: {$ne: slug},
                 isPaid: true, isApproved: true, isHided: false, isExpired: false,
             }
@@ -89,10 +94,13 @@ class PostController{
             const currentPost = await Posts.findOne({slug})
             if (!currentPost) throw new ErrorRes('Slug not found', 404)
 
+            const normalPack = await Packs.findOne({}).sort({priority: 1})
+            if (!normalPack) throw new ErrorRes('There no packs found', 404)
+
             const latestPosts = await Posts.find({
                 'address.city': currentPost.address.city,
                 'address.district': currentPost.address.district,
-                priority: 1,
+                priority: normalPack.priority,
                 slug: {$ne: slug},
                 isPaid: true, isApproved: true, isHided: false, isExpired: false, 
             })
