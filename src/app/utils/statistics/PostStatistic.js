@@ -17,6 +17,7 @@ function getMatchCondition(query){
     else if (type === 'toModerated') {
         matchCondition.isViolated = false
         matchCondition.isApproved = false
+        matchCondition.isPaid = true
     }
 
     if (month && year){
