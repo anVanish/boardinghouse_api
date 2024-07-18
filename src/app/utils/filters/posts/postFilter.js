@@ -26,7 +26,7 @@ function postFilter(query) {
 
     const filter = getFilter(search, city, district, ward, minArea, maxArea, minPrice, maxPrice, categoryId)
 
-    const sort = { priority: -1, createdAt: -1 }
+    const sort = { priority: -1, updatedAt: -1 }
 
     return { pagination, filter, sort }
 }

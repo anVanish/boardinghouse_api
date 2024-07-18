@@ -26,7 +26,7 @@ function postUserFilter(query, userId){
     const {pagination, search, city, district, ward, categoryId} = setStateFilter(query)
     const tab = query.tab || 'all'
     const filter = getFilter(userId, search, city, district, ward, tab, categoryId)
-    const sort = { createdAt: -1 }
+    const sort = { updatedAt: -1 }
 
     return { pagination, filter, sort }
 }

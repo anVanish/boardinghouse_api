@@ -29,7 +29,7 @@ function postAdminFilter(query){
     const tab = query.tab || 'all'
     const filter = getFilter(search, city, district, ward, tab, categoryId)
 
-    const sort = { createdAt: -1 }
+    const sort = { updatedAt: -1 }
 
     return { pagination, filter, sort }
 }
