@@ -29,7 +29,7 @@ function postAdminModeratorFilter(query, userId){
     const moderatedFilter = (tab === 'moderated' || tab === 'myModerated') ? query.moderatedFilter : ''
     const filter = getFilter(userId, search, city, district, ward, tab, moderatedFilter, categoryId)
 
-    const sort = { priority: -1, createdAt: -1 }
+    const sort = { createdAt: -1 }
 
     return {pagination, filter, sort}
 }
